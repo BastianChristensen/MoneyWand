@@ -4,6 +4,9 @@ import tkinter as tk
 import tkinter.font as font
 import sqlite3
 
+from db.database import create_database
+from pages.budget import BudgetPage
+
 # Properties - Window
 
 root = Tk()
@@ -11,6 +14,8 @@ root.geometry("1152x720")
 root.title("Dashboard")
 root.minsize(1152, 720)
 root.maxsize(1152, 720)
+
+# create_database()
 
 # Header
 
@@ -39,8 +44,22 @@ menu_frame.pack(side="top", fill="x")
 budget_button = tk.Menubutton(menu_frame, text="Budget", font="arial 10 bold", relief="raised", background="gray60")
 budget_button.pack(side="left", padx=5, pady=2)
 
+def show_budget_page():
+    # Clear the Dashboard
+    for widget in window.winfo_children():
+        widget.destroy()
+    
+    tab_bar = tk.Frame(window, background="gray40", height=30)
+    tab_bar.pack(fill="x")
+
+    tab_label = tk.Label(tab_bar, text="Budget", font="Arial 10", background="gray30")
+    tab_label.pack(side="left", padx=10)
+    
+    BudgetPage(window)
+
+
 budget_menu = tk.Menu(budget_button, tearoff=0)
-budget_menu.add_command(label="New")
+budget_menu.add_command(label="New", command=show_budget_page)
 budget_menu.add_command(label="Edit")
 budget_menu.add_command(label="View")
 
@@ -107,5 +126,17 @@ help_button.config(menu=help_menu)
 
 window = tk.Frame(root, background="white")
 window.pack(side="top", fill="both", expand=True)
+
+# def show_budget_page():
+#     for widget in window.winfo_children():
+#         widget.destroy()
+    
+#     tab_bar = tk.Frame(window, background="red2", height=30)
+#     tab_bar.pack(fill="x")
+
+#     tab_label = tk.Label(tab_bar, text="Budget", font="Arial 10", background="gray90")
+#     tab_label.pack(side="left", padx=10)
+    
+#     BudgetPage(window)
 
 root.mainloop()

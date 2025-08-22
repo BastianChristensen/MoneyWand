@@ -8,15 +8,26 @@ import sqlite3
 # BLOB, as is
 
 # Connect to database
-conn = sqlite3.connect("data.db")
+def create_database():
+    conn = sqlite3.connect("data.db")
 
-# Cursor
-c = conn.cursor()
+    # Cursor
+    c = conn.cursor()
 
-# Commit command
-conn.commit()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS budget (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT,
+            category TEXT,
+            amount REAL,
+            comment TEXT
+        )      
+            """)
 
-# Close connection
-conn.close()
+    # Commit command
+    conn.commit()
+
+    # Close connection
+    conn.close()
 
 
