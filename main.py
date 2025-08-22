@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter as tk
 import tkinter.font as font
+import sqlite3
 
 # Properties - Window
 
@@ -9,6 +10,7 @@ root = Tk()
 root.geometry("1152x720")
 root.title("Dashboard")
 root.minsize(1152, 720)
+root.maxsize(1152, 720)
 
 # Header
 
@@ -73,6 +75,8 @@ year_menu.add_command(label="Load")
 
 year_button.config(menu=year_menu)
 
+# Reports Button
+
 report_button = tk.Menubutton(menu_frame, text="Reports", font="arial 10 bold", relief="raised", background="gray60")
 report_button.pack(side="left", padx=5, pady=2)
 
@@ -84,5 +88,24 @@ report_menu.add_command(label="Download")
 
 report_button.config(menu=report_menu)
 
+# Help Button
+
+help_button = tk.Menubutton(menu_frame, text="Help", font="arial 10 bold", relief="raised", background="gray60")
+help_button.pack(side="left", padx=5, pady=2)
+
+help_menu = tk.Menu(help_button, tearoff=0)
+
+help_menu.add_command(label="Guide")
+help_menu.add_command(label="Report A Problem")
+
+help_button.config(menu=help_menu)
+
+
+##################################################################################################################################
+###################################################   CONTENT   ##################################################################
+##################################################################################################################################
+
+window = tk.Frame(root, background="white")
+window.pack(side="top", fill="both", expand=True)
 
 root.mainloop()
