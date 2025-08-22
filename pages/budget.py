@@ -13,7 +13,7 @@ class BudgetPage:
 ############   LEFT SECTION   ####################################################################################################################################################################################
         
         # Left section
-        left_frame = tk.Frame(self.frame, background="red2", highlightbackground="black", highlightthickness=1)
+        left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=1)
         left_frame.place(relx=0, rely=0, relwidth=0.25, relheight=1)
         
         # Inner left section
@@ -23,17 +23,55 @@ class BudgetPage:
 ############   TOP SECTION   ####################################################################################################################################################################################
 
         # Top section
-        top_frame = tk.Frame(self.frame, background="blue2", highlightbackground="black", highlightthickness=1)
+        top_frame = tk.Frame(self.frame, background="gray75", highlightbackground="black", highlightthickness=1)
         top_frame.place(relx=0.25, rely=0, relwidth=0.75, relheight=0.2)
         
         # Inner Top section
         inner_top_section = tk.LabelFrame(top_frame, text="Top Section",font="arial 15 bold", foreground="black", background="white", borderwidth=2, relief="groove")
         inner_top_section.pack(padx=10, pady=10, fill="both", expand=True)
         
+        # Wrapper frame to center grid content
+        form_wrapper = tk.Frame(inner_top_section, background="white")
+        form_wrapper.pack(expand=True)
+        
+        # Configure grid columns for even spacing
+        for i in range(4):
+            inner_top_section.columnconfigure(i, weight=1)
+        
+        entry_opts = {
+            "background": "white",
+            "foreground": "black",
+            "relief": "flat",         
+            "highlightthickness": 1, 
+            "highlightcolor": "blue"
+        }
+        
+        date_label = Label(form_wrapper, text="Date", font="arial 10 bold", background="white", foreground="black")
+        date_label.grid(row=0, column=0, padx=1, pady=5, sticky="e")
+        date_entry = Entry(form_wrapper, **entry_opts)
+        date_entry.grid(row=0, column=1, padx=1, pady=5, sticky="ew")
+        
+        amount_label = Label(form_wrapper, text="Amount", font="arial 10 bold", background="white", foreground="black")
+        amount_label.grid(row=1, column=0, padx=1, pady=5, sticky="e")
+        amount_entry = Entry(form_wrapper, **entry_opts)
+        amount_entry.grid(row=1, column=1, padx=1, pady=5, sticky="ew")
+
+        cat_label = Label(form_wrapper, text="Category", font="arial 10 bold", background="white", foreground="black")
+        cat_label.grid(row=0, column=2, padx=1, pady=5, sticky="e")
+        cat_entry = Entry(form_wrapper, **entry_opts)
+        cat_entry.grid(row=0, column=3, padx=1, pady=5, sticky="ew")
+
+        com_label = Label(form_wrapper, text="Comment", font="arial 10 bold", background="white", foreground="black")
+        com_label.grid(row=1, column=2, padx=1, pady=5, sticky="e")
+        com_entry = Entry(form_wrapper, **entry_opts)
+        com_entry.grid(row=1, column=3, padx=1, pady=5, sticky="ew")
+    
+            
+        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
 
         # Bottom section
-        bottom_frame = tk.Frame(self.frame, background="green2", highlightbackground="black", highlightthickness=1)
+        bottom_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=1)
         bottom_frame.place(relx=0.25, rely=0.2, relwidth=0.75, relheight=0.8)
         
         inner_bottom_section = tk.LabelFrame(bottom_frame, text="Bottom Section",font="arial 15 bold", foreground="black", background="white", borderwidth=2, relief="groove")

@@ -127,16 +127,4 @@ help_button.config(menu=help_menu)
 window = tk.Frame(root, background="white")
 window.pack(side="top", fill="both", expand=True)
 
-# def show_budget_page():
-#     for widget in window.winfo_children():
-#         widget.destroy()
-    
-#     tab_bar = tk.Frame(window, background="red2", height=30)
-#     tab_bar.pack(fill="x")
-
-#     tab_label = tk.Label(tab_bar, text="Budget", font="Arial 10", background="gray90")
-#     tab_label.pack(side="left", padx=10)
-    
-#     BudgetPage(window)
-
 root.mainloop()
