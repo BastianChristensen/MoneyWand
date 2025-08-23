@@ -1,5 +1,12 @@
 from tkinter import *
+from tkinter import Button
 from tkinter import ttk
+from tkinter import Toplevel, Button
+# Need this one to fix button background bug
+from tkmacosx import Button
+from tkcalendar import Calendar
+from datetime import datetime
+
 import tkinter as tk
 import tkinter.font as font
 import sqlite3
@@ -34,9 +41,6 @@ class BudgetPage:
         form_wrapper = tk.Frame(inner_top_left_section, relief="sunken", background="gray74")
         form_wrapper.pack(expand=True)
         
-        # Configure grid columns for even spacing
-        for i in range(4):
-            inner_top_left_section.columnconfigure(i, weight=1)
         
         # Common styling
         entry_opts = {
@@ -48,10 +52,33 @@ class BudgetPage:
             "borderwidth": 1
         }
         
+        # Calender
+        
+        def open_calendar(entry_widget):
+            popup = Toplevel()
+            popup.title("Select Date")
+            popup.configure(background="gray74")
+            popup.grab_set()
+
+            cal = Calendar(popup, selectmode='day', background="blue2", foreground="white", headersbackground="gray60", headersforeground="black")
+            cal.pack(padx=10, pady=10)
+
+            def select_date():
+                selected = cal.get_date()
+                entry_widget.delete(0, "end")
+                entry_widget.insert(0, selected)
+                popup.destroy()
+
+            Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
+        
+        # Content
+        
         date_label = Label(form_wrapper, text="Date", font="system 10 bold", foreground="black", background="gray74")
         date_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         date_entry = Entry(form_wrapper, **entry_opts)
         date_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1)
+        calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
         
         amount_label = Label(form_wrapper, text="Amount", font="system 10 bold", foreground="black", background="gray74")
         amount_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
@@ -59,14 +86,14 @@ class BudgetPage:
         amount_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
         cat_label = Label(form_wrapper, text="Category", font="system 10 bold", foreground="black", background="gray74")
-        cat_label.grid(row=0, column=2, padx=5, pady=5, sticky="e")
+        cat_label.grid(row=0, column=3, padx=5, pady=5, sticky="e")
         cat_entry = Entry(form_wrapper, **entry_opts)
-        cat_entry.grid(row=0, column=3, padx=5, pady=5, sticky="ew")
+        cat_entry.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
         com_label = Label(form_wrapper, text="Comment", font="system 10 bold", foreground="black", background="gray74")
-        com_label.grid(row=1, column=2, padx=5, pady=5, sticky="e")
+        com_label.grid(row=1, column=3, padx=5, pady=5, sticky="e")
         com_entry = Entry(form_wrapper, **entry_opts)
-        com_entry.grid(row=1, column=3, padx=5, pady=5, sticky="ew")
+        com_entry.grid(row=1, column=4, padx=5, pady=5, sticky="ew")
     
 ############   TOP RIGHT SECTION   ####################################################################################################################################################################################
            
