@@ -45,6 +45,7 @@ budget_button = tk.Menubutton(menu_frame, text="Budget", font="arial 10 bold", r
 budget_button.pack(side="left", padx=5, pady=2)
 
 def show_budget_page():
+    
     # Clear the Dashboard
     for widget in window.winfo_children():
         widget.destroy()
@@ -52,7 +53,7 @@ def show_budget_page():
     tab_bar = tk.Frame(window, background="gray40", height=30)
     tab_bar.pack(fill="x")
 
-    tab_label = tk.Label(tab_bar, text="Budget", font="Arial 10", background="gray30")
+    tab_label = tk.Label(tab_bar, text="Budget", font="Arial 10 bold", background="gray30", foreground="White")
     tab_label.pack(side="left", padx=10)
     
     BudgetPage(window)
