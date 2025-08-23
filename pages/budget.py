@@ -77,7 +77,7 @@ class BudgetPage:
         date_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         date_entry = Entry(form_wrapper, **entry_opts)
         date_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1)
+        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1, background="gray90")
         calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
         
         amount_label = Label(form_wrapper, text="Amount", font="system 10 bold", foreground="black", background="gray74")
@@ -102,7 +102,7 @@ class BudgetPage:
         top_right_frame.place(relx=0.75, rely=0, relwidth=0.25, relheight=0.2)
         
         # Inner Top Right section
-        inner_top_right_section = tk.LabelFrame(top_right_frame, text="Options",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_top_right_section = tk.LabelFrame(top_right_frame, text="Tools",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_top_right_section.pack(padx=10, pady=10, fill="both", expand=True)
         
         # Wrapper frame to center grid content

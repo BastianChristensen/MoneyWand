@@ -1,18 +1,24 @@
-from tkinter import *
-from tkcalendar import DateEntry
+from tkinter import *  
 
-root = Tk()
-root.configure(background="gray74")
+root = Tk()  
+root.geometry("200x200")  
 
-date_entry = DateEntry(
-    root,
-    background="green2",
-    foreground="white",
-    headersbackground="red2",
-    headersforeground="white",
-    selectbackground="blue2",
-    selectforeground="white"
-)
-date_entry.pack(padx=20, pady=20)
+def show():  
+    lbl.config(text=opt.get())  
 
-root.mainloop()
+# Dropdown options  
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]  
+
+# Selected option variable  
+opt = StringVar(value="Monday")  
+
+# Dropdown menu  
+OptionMenu(root, opt, *days).pack()  
+
+# Button to update label  
+Button(root, text="Click Me", command=show).pack()  
+
+lbl = Label(root, text=" ")  
+lbl.pack()  
+
+root.mainloop()  
