@@ -20,23 +20,23 @@ class BudgetPage:
         inner_left_section = tk.LabelFrame(left_frame, text="Overview",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_left_section.pack(padx=10, pady=10, fill="both", expand=True)
         
-############   TOP SECTION   ####################################################################################################################################################################################
+############   TOP LEFT SECTION   ####################################################################################################################################################################################
 
-        # Top section
-        top_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
-        top_frame.place(relx=0.25, rely=0, relwidth=0.75, relheight=0.2)
+        # Top Left section
+        top_left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
+        top_left_frame.place(relx=0.25, rely=0, relwidth=0.50, relheight=0.2)
         
         # Inner Top section
-        inner_top_section = tk.LabelFrame(top_frame, text="Add Entry",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
-        inner_top_section.pack(padx=10, pady=10, fill="both", expand=True)
+        inner_top_left_section = tk.LabelFrame(top_left_frame, text="Add Entry",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_top_left_section.pack(padx=10, pady=10, fill="both", expand=True)
         
         # Wrapper frame to center grid content
-        form_wrapper = tk.Frame(inner_top_section, relief="sunken", background="gray74")
+        form_wrapper = tk.Frame(inner_top_left_section, relief="sunken", background="gray74")
         form_wrapper.pack(expand=True)
         
         # Configure grid columns for even spacing
         for i in range(4):
-            inner_top_section.columnconfigure(i, weight=1)
+            inner_top_left_section.columnconfigure(i, weight=1)
         
         # Common styling
         entry_opts = {
@@ -68,7 +68,19 @@ class BudgetPage:
         com_entry = Entry(form_wrapper, **entry_opts)
         com_entry.grid(row=1, column=3, padx=5, pady=5, sticky="ew")
     
-            
+############   TOP RIGHT SECTION   ####################################################################################################################################################################################
+           
+        # Top Right section
+        top_right_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
+        top_right_frame.place(relx=0.75, rely=0, relwidth=0.25, relheight=0.2)
+        
+        # Inner Top Right section
+        inner_top_right_section = tk.LabelFrame(top_right_frame, text="Options",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_top_right_section.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        # Wrapper frame to center grid content
+        form_wrapper = tk.Frame(inner_top_right_section, relief="sunken", background="gray74")
+        form_wrapper.pack(expand=True)
         
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
 
