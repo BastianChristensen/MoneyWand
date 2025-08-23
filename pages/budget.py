@@ -2,7 +2,9 @@ from tkinter import *
 from tkinter import Button
 from tkinter import ttk
 from tkinter import Toplevel, Button
+
 # Need this one to fix button background bug
+
 from tkmacosx import Button
 from tkcalendar import Calendar
 from datetime import datetime
@@ -17,32 +19,42 @@ class BudgetPage:
         self.frame = tk.Frame(window, background="white")
         self.frame.pack(side="top", fill="both", expand=True)
         
+####################################################################################################################################################################################        
 ############   LEFT SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################        
         
         # Left section
+        
         left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
         left_frame.place(relx=0, rely=0, relwidth=0.25, relheight=1)
         
         # Inner left section
+        
         inner_left_section = tk.LabelFrame(left_frame, text="Overview",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_left_section.pack(padx=10, pady=10, fill="both", expand=True)
         
+####################################################################################################################################################################################        
 ############   TOP LEFT SECTION   ####################################################################################################################################################################################
-
+####################################################################################################################################################################################
+        
         # Top Left section
+        
         top_left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
         top_left_frame.place(relx=0.25, rely=0, relwidth=0.50, relheight=0.2)
         
         # Inner Top section
-        inner_top_left_section = tk.LabelFrame(top_left_frame, text="Add Entry",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        
+        inner_top_left_section = tk.LabelFrame(top_left_frame, text="Entry",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_top_left_section.pack(padx=10, pady=10, fill="both", expand=True)
         
         # Wrapper frame to center grid content
+        
         form_wrapper = tk.Frame(inner_top_left_section, relief="sunken", background="gray74")
         form_wrapper.pack(expand=True)
         
         
         # Common styling
+        
         entry_opts = {
             "background": "gray90",
             "foreground": "black",       
@@ -71,6 +83,8 @@ class BudgetPage:
 
             Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
         
+        # Dropdown Menu
+        
         # Content
         
         date_label = Label(form_wrapper, text="Date", font="system 10 bold", foreground="black", background="gray74")
@@ -95,21 +109,46 @@ class BudgetPage:
         com_entry = Entry(form_wrapper, **entry_opts)
         com_entry.grid(row=1, column=4, padx=5, pady=5, sticky="ew")
     
+####################################################################################################################################################################################        
 ############   TOP RIGHT SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################
            
         # Top Right section
+        
         top_right_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
         top_right_frame.place(relx=0.75, rely=0, relwidth=0.25, relheight=0.2)
         
         # Inner Top Right section
+        
         inner_top_right_section = tk.LabelFrame(top_right_frame, text="Tools",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_top_right_section.pack(padx=10, pady=10, fill="both", expand=True)
         
         # Wrapper frame to center grid content
+        
         form_wrapper = tk.Frame(inner_top_right_section, relief="sunken", background="gray74")
         form_wrapper.pack(expand=True)
         
+        # Content 
+
+        # Note: Add message: Missing Date/Cat/Amount (comment is allways optional)
+        
+        add_btn = Button(form_wrapper, text="Add", relief="raised", borderless=1, background="green2")
+        add_btn.grid(row=0, column=0, padx=[1, 5], pady=5, sticky="w")
+        
+        # Note: Add message: No entry selected
+        
+        edit_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="yellow2")
+        edit_btn.grid(row=0, column=1, padx=[5, 5], pady=5, sticky="w") 
+               
+        # Note: Add message: No entry selected
+        
+        remove_btn = Button(form_wrapper, text="Remove", relief="raised", borderless=1, background="red2")
+        remove_btn.grid(row=0, column=2, padx=[5, 1], pady=5, sticky="w")
+        
+
+####################################################################################################################################################################################        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################
 
         # Bottom section
         bottom_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
@@ -119,13 +158,17 @@ class BudgetPage:
         inner_bottom_section.pack(padx=10, pady=10, fill="both", expand=True)
         
         # TREEVIEW 
+        
         # Style
+        
         style = ttk.Style()
         
         # Theme 
+        
         style.theme_use("default")
         
         # Config. Colors
+        
         style.configure("Treeview",
             background="LightCyan2",
             foreground="black",
@@ -133,10 +176,12 @@ class BudgetPage:
             fieldbackground="LightCyan2")
         
         # Selected Color
+        
         style.map("Treeview",
-            background=[('selected', 'LightCyan4')])
+            background=[('selected', 'blue2')])
         
         # Scrollbar
+        
         tree_scroll = Scrollbar(inner_bottom_section)
         tree_scroll.pack(side="right", fill="y")
         
@@ -144,15 +189,18 @@ class BudgetPage:
                             columns=("Date", "Category", "Amount", "Comment"), show="headings")
         
         # Config Scrollbar
+        
         tree_scroll.config(command=tree.yview)
         
         # Format Columns
+        
         tree.column("Date", anchor="w", width=120)
         tree.column("Category", anchor="center", width=120)
         tree.column("Amount", anchor="center", width=120)
         tree.column("Comment", anchor="e", width=120)
          
         # Heading
+        
         tree.heading("Date", text="Date", anchor="w")
         tree.heading("Category", text="Category", anchor="center")
         tree.heading("Amount", text="Amount", anchor="center")
@@ -161,6 +209,7 @@ class BudgetPage:
         tree.pack(fill="both", expand=True)
         
         # Placeholder Data
+        
         sample_data = [
             ("2025-08-01", "Groceries", "45.20", "Weekly supermarket run"),
             ("2025-08-03", "Transport", "15.00", "Bus pass"),
@@ -215,10 +264,12 @@ class BudgetPage:
         ]
         
         # Striped Rows 
+        
         tree.tag_configure("oddrow", background="white")
-        tree.tag_configure("evenrow", background="lightblue")
+        tree.tag_configure("evenrow", background="LightSteelBlue1")
         
         # Add data
+        
         global count
         count = 0
         
