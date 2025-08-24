@@ -3,7 +3,7 @@ from tkinter import Button
 from tkinter import ttk
 from tkinter import Toplevel, Button
 
-# Need this one to fix button background bug
+# Need this one to fix button background bug 
 
 from tkmacosx import Button
 from tkcalendar import Calendar
@@ -18,6 +18,11 @@ class BudgetPage:
         self.window = window
         self.frame = tk.Frame(window, background="white")
         self.frame.pack(side="top", fill="both", expand=True)
+        
+        
+####################################################################################################################################################################################        
+############   FUNCTIONALIY    ####################################################################################################################################################################################
+####################################################################################################################################################################################
         
 ####################################################################################################################################################################################        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
@@ -156,7 +161,71 @@ class BudgetPage:
                     values=(record[0], record[1], record[2], record[3]),
                     tags=("oddrow",))
             
-            count += 1      
+            count += 1   
+        
+        # Remove entry
+        
+        def remove_entry():
+            x = tree.selection()
+            for entry in x:
+                tree.delete(entry)
+                
+        # Edit entry
+        
+        def edit_entry():
+            x = tree.selection()
+            if not x:
+                return
+            
+            item = tree.item(x[0])
+            values = item["values"]
+            
+            # New window popup
+            
+            edit_window = Toplevel()
+            edit_window.title("Edit Entry")
+
+            fields = ["Date", "Category", "Amount", "Comment"]
+            entries = []
+            
+            categories = ["cat1", "cat2", "cat3"]
+            
+            for i, field in enumerate(fields):
+                Label(edit_window, text=field).grid(row=i, column=0, padx=10, pady=5)
+
+                if field == "Category":
+                    combo = ttk.Combobox(edit_window, values=categories, state="readonly", width=28)
+                    combo.set(values[i])
+                    combo.grid(row=i, column=1, padx=10, pady=5)
+                    entries.append(combo)
+                    
+                elif field == "Date":
+                    date_entry = Entry(edit_window, width=30)
+                    date_entry.insert(0, values[i])
+                    date_entry.grid(row=i, column=1, padx=(10, 0), pady=5, sticky="w")
+
+                    pick_btn = Button(edit_window, text="Pick", command=lambda e=date_entry: open_calendar(e), background="gray90")
+                    pick_btn.grid(row=i, column=2, padx=(5, 10), pady=5, sticky="w")
+
+                    entries.append(date_entry)                   
+                    
+                else:
+                    entry = Entry(edit_window, width=30)
+                    entry.insert(0, values[i])
+                    entry.grid(row=i, column=1, padx=10, pady=5)
+                    entries.append(entry)
+        
+            def save_changes():
+                new_values = [e.get() for e in entries]
+                tree.item(x[0], values=new_values)
+                edit_window.destroy()
+                
+            save_btn = Button(edit_window, text="Save", command=save_changes, background="green2")
+            save_btn.grid(row=4, column=0, columnspan=2, pady=10)
+            
+            
+            
+               
              
 ####################################################################################################################################################################################        
 ############   LEFT SECTION   ####################################################################################################################################################################################
@@ -215,9 +284,16 @@ class BudgetPage:
             cal.pack(padx=10, pady=10)
 
             def select_date():
-                selected = cal.get_date()
+                raw_date = cal.get_date()
+                try:
+                    # Try parsing common formats
+                    parsed_date = datetime.strptime(raw_date, "%m/%d/%y")  # e.g. "8/24/25"
+                except ValueError:
+                    parsed_date = datetime.strptime(raw_date, "%m/%d/%Y")  # e.g. "08/24/2025"
+
+                formatted_date = parsed_date.strftime("%Y-%m-%d")
                 entry_widget.delete(0, "end")
-                entry_widget.insert(0, selected)
+                entry_widget.insert(0, formatted_date)
                 popup.destroy()
 
             Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
@@ -293,12 +369,12 @@ class BudgetPage:
         
         # Note: Add message: No entry selected
         
-        edit_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="yellow2", width=60)
+        edit_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="yellow2", width=60, command=edit_entry)
         edit_btn.grid(row=0, column=1, padx=[5, 5], pady=1, sticky="w") 
                
         # Note: Add message: No entry selected
         
-        remove_btn = Button(form_wrapper, text="Remove", relief="raised", borderless=1, background="red2", width=70)
+        remove_btn = Button(form_wrapper, text="Remove", relief="raised", borderless=1, background="red2", width=70, command=remove_entry)
         remove_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
 
 ####################################################################################################################################################################################        
