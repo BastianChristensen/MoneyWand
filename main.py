@@ -59,7 +59,7 @@ def show_budget_page():
     BudgetPage(window)
 
 
-budget_menu = tk.Menu(budget_button, tearoff=0)
+budget_menu = tk.Menu(budget_button, tearoff=0, relief="raised")
 budget_menu.add_command(label="New", command=show_budget_page)
 budget_menu.add_command(label="Edit")
 budget_menu.add_command(label="View")
