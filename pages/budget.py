@@ -20,185 +20,6 @@ class BudgetPage:
         self.frame.pack(side="top", fill="both", expand=True)
         
 ####################################################################################################################################################################################        
-############   LEFT SECTION   ####################################################################################################################################################################################
-####################################################################################################################################################################################        
-        
-        # Left section
-        
-        left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
-        left_frame.place(relx=0, rely=0, relwidth=0.25, relheight=1)
-        
-        # Inner left section
-        
-        inner_left_section = tk.LabelFrame(left_frame, text="Overview",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
-        inner_left_section.pack(padx=10, pady=10, fill="both", expand=True)
-        
-####################################################################################################################################################################################        
-############   TOP LEFT SECTION   ####################################################################################################################################################################################
-####################################################################################################################################################################################
-        
-        # Top Left section
-        
-        top_left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
-        top_left_frame.place(relx=0.25, rely=0, relwidth=0.50, relheight=0.2)
-        
-        # Inner Top section
-        
-        inner_top_left_section = tk.LabelFrame(top_left_frame, text="Entry",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
-        inner_top_left_section.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        # Wrapper frame to center grid content
-        
-        form_wrapper = tk.Frame(inner_top_left_section, relief="sunken", background="gray74")
-        form_wrapper.pack(expand=True)
-        
-        
-        # Common styling
-        
-        entry_opts = {
-            "background": "gray90",
-            "foreground": "black",       
-            "highlightthickness": 1,
-            "highlightcolor": "blue",
-            "width": 10,
-            "borderwidth": 1
-        }
-        
-        # Calender
-        
-        def open_calendar(entry_widget):
-            popup = Toplevel()
-            popup.title("Select Date")
-            popup.configure(background="gray74")
-            popup.grab_set()
-
-            cal = Calendar(popup, selectmode='day', background="blue2", foreground="white", headersbackground="gray60", headersforeground="black")
-            cal.pack(padx=10, pady=10)
-
-            def select_date():
-                selected = cal.get_date()
-                entry_widget.delete(0, "end")
-                entry_widget.insert(0, selected)
-                popup.destroy()
-
-            Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
-        
-        # Option Menu
-        
-        category_opt = ["opt1", "opt2", "opt3"]
-        
-        cat_var = tk.StringVar()
-        
-        # Content
-        
-        date_label = Label(form_wrapper, text="Date", font="system 10 bold", foreground="black", background="gray74")
-        date_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        date_entry = Entry(form_wrapper, **entry_opts)
-        date_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1, background="gray90")
-        calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
-        
-        # Should only accept numbers. Optional: auto-change "," to "."
-        
-        amount_label = Label(form_wrapper, text="Amount", font="system 10 bold", foreground="black", background="gray74")
-        amount_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        amount_entry = Entry(form_wrapper, **entry_opts)
-        amount_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        
-        # Should set currency - TBD - Could be implemented in settings elsewhere.
-        
-        # amount_btn = Button(form_wrapper, text="Currency", relief="raised", borderless=1, background="gray90")
-        # amount_btn.grid(row=1, column=2, padx=[0, 5], pady=5, sticky="w")
-        
-        cat_label = Label(form_wrapper, text="Category", font="system 10 bold", foreground="black", background="gray74")
-        cat_label.grid(row=0, column=3, padx=5, pady=5, sticky="e")
-        cat_entry = OptionMenu(form_wrapper, cat_var, *category_opt)
-        cat_entry.configure(relief="sunken", background="gray74")
-        cat_entry.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
-        
-        # Note: Button should change add/remove/edit the options in OptionMenu cat_entry
-        
-        cat_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="gray90")
-        cat_btn.grid(row=0, column=5, padx=[0, 5], pady=5, sticky="e")
-
-        com_label = Label(form_wrapper, text="Comment", font="system 10 bold", foreground="black", background="gray74")
-        com_label.grid(row=1, column=3, padx=5, pady=5, sticky="e")
-        com_entry = Entry(form_wrapper, **entry_opts)
-        com_entry.grid(row=1, column=4, padx=5, pady=5, sticky="ew")
-    
-####################################################################################################################################################################################        
-############   TOP RIGHT UPPER SECTION   ####################################################################################################################################################################################
-####################################################################################################################################################################################
-           
-        # Top Right section
-        
-        top_right_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
-        top_right_frame.place(relx=0.75, rely=0, relwidth=0.25, relheight=0.12)
-        
-        # Inner Top Right section
-        
-        inner_top_right_section = tk.LabelFrame(top_right_frame, text="Tools",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
-        inner_top_right_section.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        # Wrapper frame to center grid content
-        
-        form_wrapper = tk.Frame(inner_top_right_section, relief="sunken", background="gray74")
-        form_wrapper.pack(expand=True)
-        
-        # Content 
-
-        # Note: Add message: Missing Date/Cat/Amount (comment is allways optional)
-        
-        add_btn = Button(form_wrapper, text="Add", relief="raised", borderless=1, background="green2")
-        add_btn.grid(row=0, column=0, padx=[1, 5], pady=1, sticky="w")
-        
-        # Note: Add message: No entry selected
-        
-        edit_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="yellow2")
-        edit_btn.grid(row=0, column=1, padx=[5, 5], pady=1, sticky="w") 
-               
-        # Note: Add message: No entry selected
-        
-        remove_btn = Button(form_wrapper, text="Remove", relief="raised", borderless=1, background="red2")
-        remove_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
-
-####################################################################################################################################################################################        
-############   TOP RIGHT LOWER SECTION   ####################################################################################################################################################################################
-####################################################################################################################################################################################
-        
-        # Top Right Lower section
-        
-        top_right_low_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
-        top_right_low_frame.place(relx=0.75, rely=0.1, relwidth=0.25, relheight=0.12)
-        
-        # Inner Top Right Lower section
-        
-        inner_top_right_low_section = tk.LabelFrame(top_right_low_frame, text="Settings",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
-        inner_top_right_low_section.pack(padx=10, pady=10, fill="both", expand=True)
-        
-        # Wrapper frame to center grid content
-        
-        form_wrapper = tk.Frame(inner_top_right_low_section, relief="sunken", background="gray74")
-        form_wrapper.pack(expand=True)
-        
-        # Content 
-
-        # Note: Add message: Missing Date/Cat/Amount (comment is allways optional)
-        
-        curr_btn = Button(form_wrapper, text="Currency", relief="raised", borderless=1, background="gray90", width=75)
-        curr_btn.grid(row=0, column=0, padx=[5, 1], pady=1, sticky="w")
-        
-        # Note: Add message: No entry selected
-        
-        opt_btn = Button(form_wrapper, text="Setting 2", relief="raised", borderless=1, background="gray90", width=75)
-        opt_btn.grid(row=0, column=1, padx=[5, 5], pady=1, sticky="w") 
-               
-        # Note: Add message: No entry selected
-        
-        col_btn = Button(form_wrapper, text="Colors", relief="raised", borderless=1, background="gray90", width=75)
-        col_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")   
-
-####################################################################################################################################################################################        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
 ####################################################################################################################################################################################
 
@@ -335,4 +156,184 @@ class BudgetPage:
                     values=(record[0], record[1], record[2], record[3]),
                     tags=("oddrow",))
             
-            count += 1
+            count += 1      
+             
+####################################################################################################################################################################################        
+############   LEFT SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################        
+        
+        # Left section
+        
+        left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
+        left_frame.place(relx=0, rely=0, relwidth=0.25, relheight=1)
+        
+        # Inner left section
+        
+        inner_left_section = tk.LabelFrame(left_frame, text="Overview",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_left_section.pack(padx=10, pady=10, fill="both", expand=True)
+        
+####################################################################################################################################################################################        
+############   TOP LEFT SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################
+        
+        # Top Left section
+        
+        top_left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
+        top_left_frame.place(relx=0.25, rely=0, relwidth=0.50, relheight=0.2)
+        
+        # Inner Top section
+        
+        inner_top_left_section = tk.LabelFrame(top_left_frame, text="Entry",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_top_left_section.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        # Wrapper frame to center grid content
+        
+        form_wrapper = tk.Frame(inner_top_left_section, relief="sunken", background="gray74")
+        form_wrapper.pack(expand=True)
+        
+        
+        # Common styling
+        
+        entry_opts = {
+            "background": "gray90",
+            "foreground": "black",       
+            "highlightthickness": 1,
+            "highlightcolor": "blue",
+            "width": 10,
+            "borderwidth": 1
+        }
+        
+        # Calender
+        
+        def open_calendar(entry_widget):
+            popup = Toplevel()
+            popup.title("Select Date")
+            popup.configure(background="gray74")
+            popup.grab_set()
+
+            cal = Calendar(popup, selectmode='day', background="blue2", foreground="white", headersbackground="gray60", headersforeground="black")
+            cal.pack(padx=10, pady=10)
+
+            def select_date():
+                selected = cal.get_date()
+                entry_widget.delete(0, "end")
+                entry_widget.insert(0, selected)
+                popup.destroy()
+
+            Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
+        
+        # Option Menu
+        
+        category_opt = ["opt1", "opt2", "opt3"]
+        
+        cat_var = tk.StringVar()
+        
+        # Content
+        
+        date_label = Label(form_wrapper, text="Date", font="system 10 bold", foreground="black", background="gray74")
+        date_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        date_entry = Entry(form_wrapper, **entry_opts)
+        date_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1, background="gray90")
+        calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
+        
+        # Should only accept numbers. Optional: auto-change "," to "."
+        
+        amount_label = Label(form_wrapper, text="Amount", font="system 10 bold", foreground="black", background="gray74")
+        amount_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        amount_entry = Entry(form_wrapper, **entry_opts)
+        amount_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        
+        # Should set currency - TBD - Could be implemented in settings elsewhere.
+        
+        # amount_btn = Button(form_wrapper, text="Currency", relief="raised", borderless=1, background="gray90")
+        # amount_btn.grid(row=1, column=2, padx=[0, 5], pady=5, sticky="w")
+        
+        cat_label = Label(form_wrapper, text="Category", font="system 10 bold", foreground="black", background="gray74")
+        cat_label.grid(row=0, column=3, padx=5, pady=5, sticky="e")
+        cat_entry = OptionMenu(form_wrapper, cat_var, *category_opt)
+        cat_entry.configure(relief="sunken", background="gray74")
+        cat_entry.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
+        
+        # Note: Button should change add/remove/edit the options in OptionMenu cat_entry
+        
+        cat_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="gray90")
+        cat_btn.grid(row=0, column=5, padx=[0, 5], pady=5, sticky="e")
+
+        com_label = Label(form_wrapper, text="Comment", font="system 10 bold", foreground="black", background="gray74")
+        com_label.grid(row=1, column=3, padx=5, pady=5, sticky="e")
+        com_entry = Entry(form_wrapper, **entry_opts)
+        com_entry.grid(row=1, column=4, padx=5, pady=5, sticky="ew")
+    
+####################################################################################################################################################################################        
+############   TOP RIGHT UPPER SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################
+           
+        # Top Right section
+        
+        top_right_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
+        top_right_frame.place(relx=0.75, rely=0, relwidth=0.25, relheight=0.12)
+        
+        # Inner Top Right section
+        
+        inner_top_right_section = tk.LabelFrame(top_right_frame, text="Tools",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_top_right_section.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        # Wrapper frame to center grid content
+        
+        form_wrapper = tk.Frame(inner_top_right_section, relief="sunken", background="gray74")
+        form_wrapper.pack(expand=True)
+        
+        # Content 
+
+        # Note: Add message: Missing Date/Cat/Amount (comment is allways optional)
+        
+        add_btn = Button(form_wrapper, text="Add", relief="raised", borderless=1, background="green2", width=50)
+        add_btn.grid(row=0, column=0, padx=[1, 5], pady=1, sticky="w")
+        
+        # Note: Add message: No entry selected
+        
+        edit_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="yellow2", width=60)
+        edit_btn.grid(row=0, column=1, padx=[5, 5], pady=1, sticky="w") 
+               
+        # Note: Add message: No entry selected
+        
+        remove_btn = Button(form_wrapper, text="Remove", relief="raised", borderless=1, background="red2", width=70)
+        remove_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
+
+####################################################################################################################################################################################        
+############   TOP RIGHT LOWER SECTION   ####################################################################################################################################################################################
+####################################################################################################################################################################################
+        
+        # Top Right Lower section
+        
+        top_right_low_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
+        top_right_low_frame.place(relx=0.75, rely=0.1, relwidth=0.25, relheight=0.12)
+        
+        # Inner Top Right Lower section
+        
+        inner_top_right_low_section = tk.LabelFrame(top_right_low_frame, text="Settings",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        inner_top_right_low_section.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        # Wrapper frame to center grid content
+        
+        form_wrapper = tk.Frame(inner_top_right_low_section, relief="sunken", background="gray74")
+        form_wrapper.pack(expand=True)
+        
+        # Content 
+
+        # Note: Add message: Missing Date/Cat/Amount (comment is allways optional)
+        
+        curr_btn = Button(form_wrapper, text="Currency", relief="raised", borderless=1, background="gray90", width=75)
+        curr_btn.grid(row=0, column=0, padx=[5, 1], pady=1, sticky="w")
+        
+        # Note: Add message: No entry selected
+        
+        opt_btn = Button(form_wrapper, text="Setting 2", relief="raised", borderless=1, background="gray90", width=75)
+        opt_btn.grid(row=0, column=1, padx=[5, 5], pady=1, sticky="w") 
+               
+        # Note: Add message: No entry selected
+        
+        col_btn = Button(form_wrapper, text="Colors", relief="raised", borderless=1, background="gray90", width=75)
+        col_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")   
+

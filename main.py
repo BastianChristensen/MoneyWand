@@ -10,10 +10,10 @@ from pages.budget import BudgetPage
 # Properties - Window
 
 root = Tk()
-root.geometry("1152x720")
+root.geometry("1152x700")
 root.title("Dashboard")
-root.minsize(1152, 720)
-root.maxsize(1152, 720)
+root.minsize(1152, 700)
+root.maxsize(1152, 700)
 
 # create_database()
 
