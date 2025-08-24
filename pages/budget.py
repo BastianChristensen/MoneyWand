@@ -1,3 +1,5 @@
+# IMPORTS and Setup
+
 from tkinter import *
 from tkinter import Button
 from tkinter import ttk
@@ -11,7 +13,6 @@ from datetime import datetime
 
 import tkinter as tk
 import tkinter.font as font
-import sqlite3
 
 class BudgetPage:
     def __init__(self, window):
@@ -19,23 +20,19 @@ class BudgetPage:
         self.frame = tk.Frame(window, background="white")
         self.frame.pack(side="top", fill="both", expand=True)
         
-        
-####################################################################################################################################################################################        
-############   FUNCTIONALIY    ####################################################################################################################################################################################
-####################################################################################################################################################################################
-        
 ####################################################################################################################################################################################        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
 ####################################################################################################################################################################################
 
-        # Bottom section
+        # Bottom section - Treeview
+        
         bottom_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
         bottom_frame.place(relx=0.25, rely=0.2, relwidth=0.75, relheight=0.8)
         
         inner_bottom_section = tk.LabelFrame(bottom_frame, text="Expenses",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_bottom_section.pack(padx=10, pady=10, fill="both", expand=True)
         
-        # TREEVIEW 
+        # TREEVIEW
         
         # Style
         
@@ -51,7 +48,7 @@ class BudgetPage:
             background="LightCyan2",
             foreground="black",
             rowheight=25,
-            fieldbackground="LightCyan2")
+            fieldbackground="gray40")
         
         # Selected Color
         
@@ -86,82 +83,10 @@ class BudgetPage:
         
         tree.pack(fill="both", expand=True)
         
-        # Placeholder Data
-        
-        sample_data = [
-            ("2025-08-01", "Groceries", "45.20", "Weekly supermarket run"),
-            ("2025-08-03", "Transport", "15.00", "Bus pass"),
-            ("2025-08-05", "Dining", "32.50", "Dinner with friends"),
-            ("2025-08-07", "Utilities", "120.75", "Electricity bill"),
-            ("2025-08-10", "Entertainment", "60.00", "Concert ticket"),
-            ("2025-08-12", "Health", "25.00", "Pharmacy"),
-            ("2025-08-15", "Rent", "950.00", "Monthly rent"),
-            ("2025-08-18", "Subscriptions", "12.99", "Streaming service"),
-            ("2025-08-20", "Misc", "8.50", "Coffee and snack"),
-            ("2025-08-22", "Savings", "200.00", "Transfer to savings account"),
-            ("2025-08-23", "Groceries", "52.30", "Organic produce"),
-            ("2025-08-24", "Transport", "18.00", "Taxi fare"),
-            ("2025-08-25", "Dining", "40.00", "Lunch meeting"),
-            ("2025-08-26", "Utilities", "95.60", "Water bill"),
-            ("2025-08-27", "Entertainment", "75.00", "Movie night"),
-            ("2025-08-28", "Health", "30.00", "Dental checkup"),
-            ("2025-08-29", "Rent", "950.00", "Monthly rent"),
-            ("2025-08-30", "Subscriptions", "9.99", "Music app"),
-            ("2025-08-31", "Misc", "12.00", "Stationery"),
-            ("2025-09-01", "Savings", "150.00", "Emergency fund"),
-            ("2025-09-02", "Groceries", "47.80", "Weekly groceries"),
-            ("2025-09-03", "Transport", "20.00", "Train ticket"),
-            ("2025-09-04", "Dining", "28.50", "Takeout dinner"),
-            ("2025-09-05", "Utilities", "110.00", "Gas bill"),
-            ("2025-09-06", "Entertainment", "65.00", "Theater show"),
-            ("2025-09-07", "Health", "22.00", "Vitamins"),
-            ("2025-09-08", "Rent", "950.00", "Monthly rent"),
-            ("2025-09-09", "Subscriptions", "14.99", "Online course"),
-            ("2025-09-10", "Misc", "6.75", "Snacks"),
-            ("2025-09-11", "Savings", "180.00", "Investment account"),
-            ("2025-09-12", "Groceries", "50.00", "Weekly shopping"),
-            ("2025-09-13", "Transport", "10.00", "Bike repair"),
-            ("2025-09-14", "Dining", "35.00", "Brunch"),
-            ("2025-09-15", "Utilities", "130.00", "Internet bill"),
-            ("2025-09-16", "Entertainment", "55.00", "Game purchase"),
-            ("2025-09-17", "Health", "40.00", "Massage therapy"),
-            ("2025-09-18", "Rent", "950.00", "Monthly rent"),
-            ("2025-09-19", "Subscriptions", "11.99", "News app"),
-            ("2025-09-20", "Misc", "9.25", "Coffee"),
-            ("2025-09-21", "Savings", "220.00", "Savings deposit"),
-            ("2025-09-22", "Groceries", "48.90", "Weekly groceries"),
-            ("2025-09-23", "Transport", "16.00", "Bus fare"),
-            ("2025-09-24", "Dining", "30.00", "Dinner date"),
-            ("2025-09-25", "Utilities", "105.00", "Heating bill"),
-            ("2025-09-26", "Entertainment", "70.00", "Live show"),
-            ("2025-09-27", "Health", "27.00", "Eye drops"),
-            ("2025-09-28", "Rent", "950.00", "Monthly rent"),
-            ("2025-09-29", "Subscriptions", "13.99", "Fitness app"),
-            ("2025-09-30", "Misc", "7.80", "Tea and snack"),
-            ("2025-10-01", "Savings", "250.00", "Long-term savings")
-        ]
-        
         # Striped Rows 
         
         tree.tag_configure("oddrow", background="white")
         tree.tag_configure("evenrow", background="LightSteelBlue1")
-        
-        # Add data
-        
-        global count
-        count = 0
-        
-        for record in sample_data:
-            if count % 2 == 0:
-                tree.insert(parent="", index="end", iid=count, text="", 
-                    values=(record[0], record[1], record[2], record[3]),
-                    tags=("evenrow",))
-            else:
-                tree.insert(parent="", index="end", iid=count, text="", 
-                    values=(record[0], record[1], record[2], record[3]),
-                    tags=("oddrow",))
-            
-            count += 1   
         
         # Remove entry
         
@@ -170,8 +95,10 @@ class BudgetPage:
             for entry in x:
                 tree.delete(entry)
                 
+        categories = ["Food", "Utilities", "Transport", "Savings", "Insurance", "Debt", "Health", "Entertainment", "Misc"]
+                
         # Edit entry
-        
+    
         def edit_entry():
             x = tree.selection()
             if not x:
@@ -188,19 +115,20 @@ class BudgetPage:
             fields = ["Date", "Category", "Amount", "Comment"]
             entries = []
             
-            categories = ["cat1", "cat2", "cat3"]
-            
+            # Itterates through [0] - n in fields.
             for i, field in enumerate(fields):
                 Label(edit_window, text=field).grid(row=i, column=0, padx=10, pady=5)
 
                 if field == "Category":
                     combo = ttk.Combobox(edit_window, values=categories, state="readonly", width=28)
+                    combo.configure(state="disabled")
                     combo.set(values[i])
                     combo.grid(row=i, column=1, padx=10, pady=5)
                     entries.append(combo)
                     
                 elif field == "Date":
                     date_entry = Entry(edit_window, width=30)
+                    date_entry.configure(state="disabled")
                     date_entry.insert(0, values[i])
                     date_entry.grid(row=i, column=1, padx=(10, 0), pady=5, sticky="w")
 
@@ -272,9 +200,10 @@ class BudgetPage:
             "borderwidth": 1
         }
         
-        # Calender
+        # Calender Widget
         
         def open_calendar(entry_widget):
+            date_entry.configure(state="normal")
             popup = Toplevel()
             popup.title("Select Date")
             popup.configure(background="gray74")
@@ -287,20 +216,20 @@ class BudgetPage:
                 raw_date = cal.get_date()
                 try:
                     # Try parsing common formats
-                    parsed_date = datetime.strptime(raw_date, "%m/%d/%y")  # e.g. "8/24/25"
+                    parsed_date = datetime.strptime(raw_date, "%m/%d/%y")  
                 except ValueError:
-                    parsed_date = datetime.strptime(raw_date, "%m/%d/%Y")  # e.g. "08/24/2025"
-
+                    parsed_date = datetime.strptime(raw_date, "%m/%d/%Y") 
+                    
                 formatted_date = parsed_date.strftime("%Y-%m-%d")
                 entry_widget.delete(0, "end")
                 entry_widget.insert(0, formatted_date)
+                # Locks the entry widget to prevent incorrect data
+                date_entry.configure(state="readonly")
                 popup.destroy()
 
             Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
         
         # Option Menu
-        
-        category_opt = ["opt1", "opt2", "opt3"]
         
         cat_var = tk.StringVar()
         
@@ -309,6 +238,7 @@ class BudgetPage:
         date_label = Label(form_wrapper, text="Date", font="system 10 bold", foreground="black", background="gray74")
         date_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         date_entry = Entry(form_wrapper, **entry_opts)
+        date_entry.configure(state="disabled")
         date_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1, background="gray90")
         calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
@@ -327,7 +257,7 @@ class BudgetPage:
         
         cat_label = Label(form_wrapper, text="Category", font="system 10 bold", foreground="black", background="gray74")
         cat_label.grid(row=0, column=3, padx=5, pady=5, sticky="e")
-        cat_entry = OptionMenu(form_wrapper, cat_var, *category_opt)
+        cat_entry = OptionMenu(form_wrapper, cat_var, *categories)
         cat_entry.configure(relief="sunken", background="gray74")
         cat_entry.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
         
