@@ -48,7 +48,7 @@ class BudgetPage:
             background="LightCyan2",
             foreground="black",
             rowheight=25,
-            fieldbackground="gray40")
+            fieldbackground="white")
         
         # Selected Color
         
@@ -203,7 +203,8 @@ class BudgetPage:
         # Calender Widget
         
         def open_calendar(entry_widget):
-            date_entry.configure(state="normal")
+            # Always set to normal before opening calendar
+            entry_widget.config(state="normal", background="gray75", readonlybackground="gray90")
             popup = Toplevel()
             popup.title("Select Date")
             popup.configure(background="gray74")
@@ -223,8 +224,7 @@ class BudgetPage:
                 formatted_date = parsed_date.strftime("%Y-%m-%d")
                 entry_widget.delete(0, "end")
                 entry_widget.insert(0, formatted_date)
-                # Locks the entry widget to prevent incorrect data
-                date_entry.configure(state="readonly")
+                entry_widget.config(state="readonly", background="gray90", readonlybackground="gray90")
                 popup.destroy()
 
             Button(popup, text="Select", command=select_date, borderless=1).pack(pady=5, padx=5)
@@ -237,10 +237,10 @@ class BudgetPage:
         
         date_label = Label(form_wrapper, text="Date", font="system 10 bold", foreground="black", background="gray74")
         date_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        date_entry = Entry(form_wrapper, **entry_opts)
-        date_entry.configure(state="disabled")
+        date_entry = Entry(form_wrapper, highlightthickness=1, highlightcolor="blue", width=10, borderwidth=1, readonlybackground="gray90", foreground="black")
+        date_entry.configure(state="readonly")
         date_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1, background="gray90")
+        calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1)
         calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
         
         # Should only accept numbers. Optional: auto-change "," to "."
@@ -260,11 +260,6 @@ class BudgetPage:
         cat_entry = OptionMenu(form_wrapper, cat_var, *categories)
         cat_entry.configure(relief="sunken", background="gray74")
         cat_entry.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
-        
-        # Note: Button should change add/remove/edit the options in OptionMenu cat_entry
-        
-        cat_btn = Button(form_wrapper, text="Edit", relief="raised", borderless=1, background="gray90")
-        cat_btn.grid(row=0, column=5, padx=[0, 5], pady=5, sticky="e")
 
         com_label = Label(form_wrapper, text="Comment", font="system 10 bold", foreground="black", background="gray74")
         com_label.grid(row=1, column=3, padx=5, pady=5, sticky="e")
@@ -341,5 +336,5 @@ class BudgetPage:
         # Note: Add message: No entry selected
         
         col_btn = Button(form_wrapper, text="Colors", relief="raised", borderless=1, background="gray90", width=75)
-        col_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")   
+        col_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
 
