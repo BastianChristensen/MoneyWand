@@ -4,6 +4,7 @@ from tkinter import ttk
 import tkinter as tk
 import tkinter.font as font
 from pages.budget import BudgetPage
+from pages.year import YearPage
 
 ############################################## ROOT Setup ##############################################
 
@@ -61,6 +62,21 @@ def show_budget_page():
     # BudgetPage class with window as input
     BudgetPage(window)
 
+def show_year_page():
+    # Cleares the Dashboard
+    for widget in window.winfo_children():
+        widget.destroy()
+    
+    # Creates the tab bar (dark gray)
+    tab_bar = tk.Frame(window, background="gray40", height=30)
+    tab_bar.pack(fill="x")
+    
+    # Creates the tab itself
+    tab_label = tk.Label(tab_bar, text="Yearly Overview", font="Arial 10 bold", background="gray30", foreground="White")
+    tab_label.pack(side="left", padx=10)
+    
+    YearPage(window)
+
 # Budget Menu Dropdown Options
 
 budget_menu = tk.Menu(budget_button, tearoff=0, relief="raised")
@@ -102,7 +118,7 @@ year_button.pack(side="left", padx=5, pady=2)
 
 year_menu = tk.Menu(year_button, tearoff=0)
 
-year_menu.add_command(label="New")
+year_menu.add_command(label="New", command=show_year_page)
 year_menu.add_command(label="Edit")
 year_menu.add_command(label="Load")
 
@@ -136,8 +152,6 @@ help_menu.add_command(label="Guide")
 help_menu.add_command(label="Report A Problem")
 
 help_button.config(menu=help_menu)
-
-
 
 ###################################################   CONTENT   ##################################################################
 

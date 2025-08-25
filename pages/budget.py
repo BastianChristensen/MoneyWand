@@ -1,4 +1,6 @@
 # IMPORTS and Setup
+import tkinter as tk
+import tkinter.font as font
 
 from tkinter import *
 from tkinter import Button
@@ -10,9 +12,6 @@ from tkinter import Toplevel, Button
 from tkmacosx import Button
 from tkcalendar import Calendar
 from datetime import datetime
-
-import tkinter as tk
-import tkinter.font as font
 
 class BudgetPage:
     def __init__(self, window):
@@ -76,7 +75,7 @@ class BudgetPage:
          
         # Heading
         
-        tree.heading("Date", text="Date", anchor="w")
+        tree.heading("Date", text="Date", anchor="center")
         tree.heading("Category", text="Category", anchor="center")
         tree.heading("Amount", text="Amount", anchor="center")
         tree.heading("Comment", text="Comment", anchor="center")
@@ -151,9 +150,7 @@ class BudgetPage:
             save_btn = Button(edit_window, text="Save", command=save_changes, background="green2")
             save_btn.grid(row=4, column=0, columnspan=2, pady=10)
             
-            
-            
-               
+                 
              
 ####################################################################################################################################################################################        
 ############   LEFT SECTION   ####################################################################################################################################################################################
