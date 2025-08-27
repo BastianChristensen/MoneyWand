@@ -5,6 +5,9 @@ import tkinter as tk
 import tkinter.font as font
 from pages.budget import BudgetPage
 from pages.year import YearPage
+from pages.savings import SavingsPage
+from pages.reports import ReportPage
+from pages.help_1 import Guide
 
 ############################################## ROOT Setup ##############################################
 
@@ -33,7 +36,7 @@ icon_label.place(x=360, y=-5)
 
 # Menubar - Dark gray bar with bottons. Underneath the header
 
-menu_frame = tk.Frame(root, background="gray60", height=30)
+menu_frame = tk.Frame(root, background="gray60", height=30) 
 menu_frame.pack(side="top", fill="x")
 
 ###################################################   MENUBAR BUTTONS  ###################################################################
@@ -76,6 +79,52 @@ def show_year_page():
     tab_label.pack(side="left", padx=10)
     
     YearPage(window)
+    
+def show_savings_page():
+    # Cleares the Dashboard
+    for widget in window.winfo_children():
+        widget.destroy()
+        
+    # Creates the tab bar (dark gray)
+    tab_bar = tk.Frame(window, background="gray40", height=30)
+    tab_bar.pack(fill="x")
+    
+    # Creates the tab itself
+    tab_label = tk.Label(tab_bar, text="Savings Page", font="Arial 10 bold", background="gray30", foreground="White")
+    tab_label.pack(side="left", padx=10)
+    
+    SavingsPage(window)
+
+def show_report_page():
+    # Cleares the Dashboard
+    for widget in window.winfo_children():
+        widget.destroy()
+        
+    # Creates the tab bar (dark gray)
+    tab_bar = tk.Frame(window, background="gray40", height=30)
+    tab_bar.pack(fill="x")
+    
+    # Creates the tab itself
+    tab_label = tk.Label(tab_bar, text="Reports Page", font="Arial 10 bold", background="gray30", foreground="White")
+    tab_label.pack(side="left", padx=10)
+    
+    ReportPage(window)
+      
+def show_guide_page():
+    # Cleares the Dashboard
+    for widget in window.winfo_children():
+        widget.destroy()
+        
+    # Creates the tab bar (dark gray)
+    tab_bar = tk.Frame(window, background="gray40", height=30)
+    tab_bar.pack(fill="x")
+    
+    # Creates the tab itself
+    tab_label = tk.Label(tab_bar, text="Reports Page", font="Arial 10 bold", background="gray30", foreground="White")
+    tab_label.pack(side="left", padx=10)
+    
+    Guide(window)
+      
 
 # Budget Menu Dropdown Options
 
@@ -100,12 +149,9 @@ savings_button.pack(side="left", padx=5, pady=2)
 
 savings_menu = tk.Menu(savings_button, tearoff=0)
 
-savings_menu.add_command(label="Set Savings Goal")
-savings_menu.add_command(label="Edit Savings Goal")
+savings_menu.add_command(label="Open", command=show_savings_page)
 savings_menu.add_separator()
-savings_menu.add_command(label="Add Entry")
-savings_menu.add_command(label="Edit Entry")
-savings_menu.add_command(label="Remove Entry")
+savings_menu.add_command(label="Quick Add")
 
 savings_button.config(menu=savings_menu)
 
@@ -118,9 +164,8 @@ year_button.pack(side="left", padx=5, pady=2)
 
 year_menu = tk.Menu(year_button, tearoff=0)
 
-year_menu.add_command(label="New", command=show_year_page)
-year_menu.add_command(label="Edit")
-year_menu.add_command(label="Load")
+year_menu.add_command(label="Open", command=show_year_page)
+year_menu.add_command(label="New")
 
 year_button.config(menu=year_menu)
 
@@ -133,9 +178,8 @@ report_button.pack(side="left", padx=5, pady=2)
 
 report_menu = tk.Menu(report_button, tearoff=0)
 
-report_menu.add_command(label="Generate")
-report_menu.add_command(label="Load")
-report_menu.add_command(label="Download")
+report_menu.add_command(label="Open", command=show_report_page)
+
 
 report_button.config(menu=report_menu)
 
@@ -148,8 +192,8 @@ help_button.pack(side="left", padx=5, pady=2)
 
 help_menu = tk.Menu(help_button, tearoff=0)
 
-help_menu.add_command(label="Guide")
-help_menu.add_command(label="Report A Problem")
+help_menu.add_command(label="Guide", command=show_guide_page)
+help_menu.add_command(label="Report A Problem") # Set up link to Formspree page on website.
 
 help_button.config(menu=help_menu)
 

@@ -1,15 +1,16 @@
+# Imports
 import tkinter as tk
 
 from tkinter import ttk
 from tkinter import*
 from tkmacosx import Button
 
-class ReportPage:
+class Guide:
     def __init__(self, window):
         self.window = window
         self.frame = tk.Frame(window, background="gray74")
         self.frame.pack(side="top", fill="both", expand=True)
-        
+
 ####################################################################################################################################################################################        
 ############   LEFT SECTION   ####################################################################################################################################################################################
 ####################################################################################################################################################################################      
@@ -17,7 +18,7 @@ class ReportPage:
         left_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
         left_frame.place(relx=0, rely=0, relwidth=0.3, relheight=1)
         
-        inner_left_frame = tk.LabelFrame(left_frame, text="PLACEHOLDER", font="system 15 bold", foreground="black", background="gray74", borderwidth=1, relief="sunken")
+        inner_left_frame = tk.LabelFrame(left_frame, text="How do I...", font="system 15 bold", foreground="black", background="gray74", borderwidth=1, relief="sunken")
         inner_left_frame.pack(padx=10, pady=10, fill="both", expand=True)
         
 ####################################################################################################################################################################################        
@@ -27,56 +28,6 @@ class ReportPage:
         right_frame = tk.Frame(self.frame, background="gray74", highlightbackground="black", highlightthickness=None)
         right_frame.place(relx=0.3, rely=0, relwidth=0.7, relheight=1)
         
-        inner_right_frame = tk.LabelFrame(right_frame, text="Reports", font="system 15 bold", foreground="black", background="gray74", borderwidth=1, relief="sunken")
+        inner_right_frame = tk.LabelFrame(right_frame, text="Guide", font="system 15 bold", foreground="black", background="gray74", borderwidth=1, relief="sunken")
         inner_right_frame.pack(padx=10, pady=10, fill="both", expand=True)
         
-        # TREEVIEW
-        
-        # Style
-        
-        style = ttk.Style()
-        
-        # Theme 
-        
-        style.theme_use("default")
-        
-        # Config. Colors
-        
-        style.configure("Treeview",
-            background="LightCyan2",
-            foreground="black",
-            rowheight=25,
-            fieldbackground="white")
-        
-        # Selected Color
-        
-        style.map("Treeview",
-            background=[('selected', 'blue2')])
-        
-        # Scrollbar
-        
-        tree_scroll = Scrollbar(inner_right_frame)
-        tree_scroll.pack(side="right", fill="y")
-        
-        tree = ttk.Treeview(inner_right_frame, selectmode="extended",
-                            columns=("Year", "Month"), show="headings")
-        
-        # Config Scrollbar
-        
-        tree_scroll.config(command=tree.yview)
-        
-        # Format Columns
-        
-        tree.column("Year", anchor="center", width=30)
-        tree.column("Month",anchor="center",  width=30)
-
-        # Heading
-        tree.heading("Year", text="Year")
-        tree.heading("Month", text="Month")
-        
-        tree.pack(fill="both", expand=True)
-        
-        # Striped Rows 
-        
-        tree.tag_configure("oddrow", background="white")
-        tree.tag_configure("evenrow", background="LightSteelBlue1")
