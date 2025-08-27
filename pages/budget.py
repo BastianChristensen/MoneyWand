@@ -1,6 +1,5 @@
 # IMPORTS and Setup
 import tkinter as tk
-import tkinter.font as font
 
 from tkinter import *
 from tkinter import Button
@@ -8,8 +7,8 @@ from tkinter import ttk
 from tkinter import Toplevel, Button
 
 # Need this one to fix button background bug 
-
 from tkmacosx import Button
+
 from tkcalendar import Calendar
 from datetime import datetime
 
@@ -201,7 +200,7 @@ class BudgetPage:
         
         def open_calendar(entry_widget):
             # Always set to normal before opening calendar
-            entry_widget.config(state="normal", background="gray75", readonlybackground="gray90")
+            entry_widget.config(state="normal", background="gray74", readonlybackground="gray90")
             popup = Toplevel()
             popup.title("Select Date")
             popup.configure(background="gray74")
@@ -240,7 +239,7 @@ class BudgetPage:
         calendar_btn = Button(form_wrapper, text="Pick", command=lambda: open_calendar(date_entry), relief="raised", borderless=1)
         calendar_btn.grid(row=0, column=2, padx=[0, 5], pady=5, sticky="w")
         
-        # Should only accept numbers. Optional: auto-change "," to "."
+        # Should only accept numbers. Auto-change "," to "."
         
         amount_label = Label(form_wrapper, text="Amount", font="system 10 bold", foreground="black", background="gray74")
         amount_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
@@ -255,7 +254,7 @@ class BudgetPage:
         cat_label = Label(form_wrapper, text="Category", font="system 10 bold", foreground="black", background="gray74")
         cat_label.grid(row=0, column=3, padx=5, pady=5, sticky="e")
         cat_entry = OptionMenu(form_wrapper, cat_var, *categories)
-        cat_entry.configure(relief="sunken", background="gray74")
+        cat_entry.configure(relief="sunken", background="gray74", foreground="black")
         cat_entry.grid(row=0, column=4, padx=5, pady=5, sticky="ew")
 
         com_label = Label(form_wrapper, text="Comment", font="system 10 bold", foreground="black", background="gray74")
