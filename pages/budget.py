@@ -13,8 +13,9 @@ from tkcalendar import Calendar
 from datetime import datetime
 
 class BudgetPage:
-    def __init__(self, window):
+    def __init__(self, window, id):
         self.window = window
+        self.id = id
         self.frame = tk.Frame(window, background="white")
         self.frame.pack(side="top", fill="both", expand=True)
         
@@ -109,6 +110,9 @@ class BudgetPage:
             
             edit_window = Toplevel()
             edit_window.title("Edit Entry")
+         
+            edit_window.grab_set()
+            edit_window.transient(window)
 
             fields = ["Date", "Category", "Amount", "Comment"]
             entries = []
