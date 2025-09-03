@@ -1,5 +1,6 @@
 # IMPORTS and Setup
 import tkinter as tk
+import sqlite3
 
 from tkinter import *
 from tkinter import Button
@@ -13,12 +14,29 @@ from tkcalendar import Calendar
 from datetime import datetime
 
 class BudgetPage:
-    def __init__(self, window, id):
+    def __init__(self, window, id, name, cat_id, currency, spending_limit):
         self.window = window
         self.id = id
+        self.name = name
+        self.cat_id = cat_id
+        self.currency = currency
+        self.spending_limit = spending_limit
         self.frame = tk.Frame(window, background="white")
         self.frame.pack(side="top", fill="both", expand=True)
+
+####################################################################################################################################################################################        
+############   MISC   ####################################################################################################################################################################################
+####################################################################################################################################################################################
+
+        # Fetch budget name
+        conn = sqlite3.connect("moneywand.db")
+        c = conn.cursor()
+
+        c.execute("SELECT year, month FROM budgets WHERE id=?", (self.id,))
+        budget_name = c.fetchone()
         
+        conn.close()
+      
 ####################################################################################################################################################################################        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
 ####################################################################################################################################################################################
@@ -32,17 +50,14 @@ class BudgetPage:
         inner_bottom_section.pack(padx=10, pady=10, fill="both", expand=True)
         
         # TREEVIEW
-        
+
         # Style
-        
         style = ttk.Style()
         
         # Theme 
-        
         style.theme_use("default")
         
         # Config. Colors
-        
         style.configure("Treeview",
             background="LightCyan2",
             foreground="black",
@@ -50,18 +65,16 @@ class BudgetPage:
             fieldbackground="white")
         
         # Selected Color
-        
         style.map("Treeview",
             background=[('selected', 'blue2')])
         
         # Scrollbar
-        
         tree_scroll = Scrollbar(inner_bottom_section)
         tree_scroll.pack(side="right", fill="y")
         
         tree = ttk.Treeview(inner_bottom_section, yscrollcommand=tree_scroll.set, selectmode="extended",
                             columns=("Date", "Category", "Amount", "Comment"), show="headings")
-        
+                
         # Config Scrollbar
         
         tree_scroll.config(command=tree.yview)
@@ -87,14 +100,32 @@ class BudgetPage:
         tree.tag_configure("oddrow", background="white")
         tree.tag_configure("evenrow", background="LightSteelBlue1")
         
+        # Data
+        def query_database():                
+            conn = sqlite3.connect("moneywand.db")
+            c = conn.cursor()
+            
+            c.execute("SELECT * FROM expenses WHERE budget_id=?", (self.id,))
+            expenses = c.fetchall()
+            
+            global count 
+            count = 0
+            
+            for expense in expenses:
+                if count % 2 == 0:
+                    tree.insert(parent='', index='end', iid=count, text='', values=(expense[1], expense[2], expense[3], expense[4]), tags=("evenrow"),)
+                else:
+                    tree.insert(parent='', index='end', iid=count, text='', values=(expense[1], expense[2], expense[3], expense[4]), tags=("oddrow"),)
+                count += 1
+        
+            conn.close()
+        
         # Remove entry
         
         def remove_entry():
             x = tree.selection()
             for entry in x:
                 tree.delete(entry)
-                
-        categories = ["Food", "Utilities", "Transport", "Savings", "Insurance", "Debt", "Health", "Entertainment", "Misc"]
                 
         # Edit entry
     
@@ -152,8 +183,7 @@ class BudgetPage:
                 
             save_btn = Button(edit_window, text="Save", command=save_changes, background="green2")
             save_btn.grid(row=4, column=0, columnspan=2, pady=10)
-            
-                 
+                     
              
 ####################################################################################################################################################################################        
 ############   LEFT SECTION   ####################################################################################################################################################################################
@@ -166,7 +196,8 @@ class BudgetPage:
         
         # Inner left section
         
-        inner_left_section = tk.LabelFrame(left_frame, text="Overview",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
+        year, month = budget_name
+        inner_left_section = tk.LabelFrame(left_frame, text=f"{month}, {year}",font="system 12 bold", foreground="black", background="gray74", borderwidth=2, relief="sunken")
         inner_left_section.pack(padx=10, pady=10, fill="both", expand=True)
         
 ####################################################################################################################################################################################        
@@ -249,11 +280,6 @@ class BudgetPage:
         amount_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         amount_entry = Entry(form_wrapper, **entry_opts)
         amount_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        
-        # Should set currency - TBD - Could be implemented in settings elsewhere.
-        
-        # amount_btn = Button(form_wrapper, text="Currency", relief="raised", borderless=1, background="gray90")
-        # amount_btn.grid(row=1, column=2, padx=[0, 5], pady=5, sticky="w")
         
         cat_label = Label(form_wrapper, text="Category", font="system 10 bold", foreground="black", background="gray74")
         cat_label.grid(row=0, column=3, padx=5, pady=5, sticky="e")
@@ -338,3 +364,7 @@ class BudgetPage:
         col_btn = Button(form_wrapper, text="Colors", relief="raised", borderless=1, background="gray90", width=75)
         col_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
 
+
+        ########### RUN ##########
+        
+        query_database()
