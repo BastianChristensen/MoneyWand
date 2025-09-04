@@ -4,6 +4,7 @@ from tkinter import *
 
 import tkinter as tk
 import tkinter.messagebox
+import json
 from tkinter import ttk
 from tkinter import Toplevel, Button
 
@@ -92,7 +93,7 @@ menu_frame.pack(side="top", fill="x")
 
 # Budget Menu Button
 
-budget_button = tk.Menubutton(menu_frame, text="Budget", font="arial 10 bold", relief="raised", background="gray60")
+budget_button = tk.Menubutton(menu_frame, text="Budget", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 budget_button.pack(side="left", padx=5, pady=2)
 
 ###################################################   OPEN FUNCTIONS  ###################################################################
@@ -110,9 +111,21 @@ def show_budget_page(id):
     tab_label = tk.Label(tab_bar, text="Budget", font="Arial 10 bold", background="gray30", foreground="White")
     tab_label.pack(side="left", padx=10)
     
-    # BudgetPage class with window as input
-    BudgetPage(window, id)
-
+    # Fetch settings
+    conn = sqlite3.connect("moneywand.db")
+    c = conn.cursor()
+    c.execute("SELECT name, currency, categories, spending_limits FROM budgets WHERE id=?", (id,))
+    row = c.fetchone()
+    conn.close()
+    
+    if row:
+        name, currency, categories_json, limits_json = row
+        categories = json.loads(categories_json)
+        spending_limits = json.loads(limits_json)
+        BudgetPage(window, id, name, categories, currency, spending_limits)
+    else:
+        BudgetPage(window, id, "", [], "", {})
+    
 def show_year_page():
     # Cleares the Dashboard
     for widget in window.winfo_children():
@@ -295,16 +308,16 @@ def new_budget():
                 ######################################## NAME ########################################
                 
                 
-                name_label = tk.Label(t_inner, text="Name", font="system 10 bold", background="gray82")
+                name_label = tk.Label(t_inner, text="Name", font="system 10 bold", background="gray82", foreground="black")
                 name_label.grid(row=0, column=0, padx=10, pady=10)
                 
-                name_label_b = tk.Label(b_inner, text="Name", font="system 10 bold", background="lightsteelblue1")
+                name_label_b = tk.Label(b_inner, text="Name", font="system 10 bold", background="lightsteelblue1", foreground="black")
                 name_label_b.grid(row=0, column=0, padx=10, pady=10) 
                 
-                name_data = tk.Label(b_inner, text=f"{sel_month}, {sel_year}", font="system 10 bold", background="lightsteelblue1", anchor="e")
+                name_data = tk.Label(b_inner, text=f"{sel_month}, {sel_year}", font="system 10 bold", background="lightsteelblue1", anchor="e", foreground="black")
                 name_data.grid(row=0, column=1, padx=10, pady=10)
                 
-                name_entry = tk.Entry(t_inner, highlightthickness=1, highlightcolor="blue", width=10, borderwidth=1, readonlybackground="gray90", foreground="black")
+                name_entry = tk.Entry(t_inner, highlightthickness=1, highlightcolor="blue", width=10, borderwidth=1, readonlybackground="gray90", foreground="black", background="gray90")
                 name_entry.grid(row=0, column=1, padx=10, pady=10)
                 
                 def apply_name_func():
@@ -325,13 +338,13 @@ def new_budget():
                 ######################################### CURRENCY ########################################
                 
                 
-                curr_label = tk.Label(t_inner, text="Currency", font="system 10 bold", background="gray82")
+                curr_label = tk.Label(t_inner, text="Currency", font="system 10 bold", background="gray82", foreground="black")
                 curr_label.grid(row=2, column=0, padx=10, pady=10)
                 
-                curr_label_b = tk.Label(b_inner, text="Currency", font="system 10 bold", background="lightsteelblue1")
+                curr_label_b = tk.Label(b_inner, text="Currency", font="system 10 bold", background="lightsteelblue1", foreground="black")
                 curr_label_b.grid(row=2, column=0, padx=10, pady=10) 
                 
-                curr_data = tk.Label(b_inner, text="NOK", font="system 10 bold", background="lightsteelblue1", anchor="e")
+                curr_data = tk.Label(b_inner, text="NOK", font="system 10 bold", background="lightsteelblue1", anchor="e", foreground="black")
                 curr_data.grid(row=2, column=1, padx=10, pady=10)
                 
                 cat_var = tk.StringVar()
@@ -364,16 +377,17 @@ def new_budget():
                 ######################################## CATEGORIES ########################################    
                 
                 
-                cat_label = tk.Label(t_inner, text="Categories", font="system 10 bold", background="gray82")
+                cat_label = tk.Label(t_inner, text="Categories", font="system 10 bold", background="gray82", foreground="black")
                 cat_label.grid(row=4, column=0, padx=10, pady=10)
 
-                b_cat_label = tk.Label(b_inner, text="Categories", font="system 10 bold", background="lightsteelblue1")
+                b_cat_label = tk.Label(b_inner, text="Categories", font="system 10 bold", background="lightsteelblue1", foreground="black")
                 b_cat_label.grid(row=4, column=0, padx=10, pady=10)
                 
                 cat_data = tk.Label(
                     b_inner,
                     text=", ".join(categories),
                     font="system 10 bold",
+                    foreground="blue",
                     background="lightsteelblue1",
                     anchor="e",
                     wraplength=200,
@@ -394,14 +408,15 @@ def new_budget():
                     p.grab_set()
                     p.transient(pop)
             
-                    listbox = tk.Listbox(p, selectmode=tk.SINGLE)
+                    listbox = tk.Listbox(p, selectmode=tk.SINGLE, background="white", foreground="black")
                     listbox.pack(fill="both", expand=True, padx=10, pady=10)
                     for cat in categories:
                         listbox.insert(tk.END, cat)
 
-                    new_cat_entry = tk.Entry(p)
+                    new_cat_entry = tk.Entry(p, foreground="black", background="white", borderwidth=1,
+                                             highlightthickness=1, highlightbackground="blue")
                     new_cat_entry.pack(padx=10, pady=5)
-
+                    
                     def add_category():
                         new_cat = new_cat_entry.get().strip()
                         if new_cat and new_cat not in categories:
@@ -443,10 +458,13 @@ def new_budget():
 
                 spending_limits = {cat: 0 for cat in categories}
 
+                # Function for editing limits
                 def edit_limit_pop():
                     limit_pop = tk.Toplevel(pop)
                     limit_pop.title("Edit Spending Limits")
-                    limit_pop.geometry("300x400")
+                    limit_pop.geometry("300x450")
+                    limit_pop.maxsize(300, 450)
+                    limit_pop.minsize(300, 450)
                     limit_pop.configure(background="gray90")
                     
                     limit_pop.grab_set()
@@ -456,9 +474,10 @@ def new_budget():
 
                     # Create entry for each category
                     for i, cat in enumerate(categories):
-                        lbl = tk.Label(limit_pop, text=cat, background="gray90", font="system 10")
+                        lbl = tk.Label(limit_pop, text=cat, background="gray90", font="system 10", foreground="black")
                         lbl.grid(row=i, column=0, padx=10, pady=5, sticky="w")
-                        ent = tk.Entry(limit_pop, width=10)
+                        ent = tk.Entry(limit_pop, width=10, background="white", foreground="black", borderwidth=1,
+                                       highlightthickness=1, highlightcolor="blue")                        
                         ent.insert(0, str(spending_limits.get(cat, 0)))
                         ent.grid(row=i, column=1, padx=10, pady=5)
                         entries[cat] = ent
@@ -475,29 +494,45 @@ def new_budget():
                     save_btn = Button(limit_pop, text="Save", background="PaleGreen1", borderless=1, command=save_limits)
                     save_btn.grid(row=len(categories), column=0, columnspan=2, pady=10)
                          
-                lim_label = tk.Label(t_inner, text="Spending Limit", font="system 10 bold", background="gray82")
+                lim_label = tk.Label(t_inner, text="Spending Limit", font="system 10 bold", background="gray82", foreground="black")
                 lim_label.grid(row=6, column=0, padx=10, pady=10)
                 
                 lim_edit = Button(t_inner, text="Edit", relief="raised", borderless=1, command=edit_limit_pop)
                 lim_edit.grid(row=6, column=2, padx=10, pady=10)     
-                       
-                crt_btn = Button(t_inner, text="Continue", relief="raised", borderless=1, font="system 15 bold")
+
+
+                def make_budget():
+                    # Collect input data
+                    budget_name = name_entry.get() or f"{sel_month}, {sel_year}"
+                    budget_currency = cat_var.get() or "NOK"
+                    budget_categories = categories[:]
+                    budget_limits = spending_limits.copy()
+
+                    # Insert budget into database with all fields
+                    c.execute("""
+                        INSERT INTO budgets (year, month, name, currency, categories, spending_limits)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    """, (
+                        sel_year,
+                        sel_month,
+                        budget_name,
+                        budget_currency,
+                        json.dumps(budget_categories),
+                        json.dumps(budget_limits)
+                    ))
+                    conn.commit()
+                    budget_id = c.lastrowid
+                    conn.close()
+                    pop.destroy()
+                    new_bud_pop.destroy()
+                    show_budget_page(budget_id)
+                
+                crt_btn = Button(t_inner, text="Continue", relief="raised", borderless=1, font="system 15 bold", command=make_budget)
                 crt_btn.grid(row=7, column=0, columnspan=3, padx=10, pady=[20, 10], sticky="ew")
                 
-                # Insert budget into database
-                c.execute("INSERT INTO budgets (year, month) VALUES (?, ?)", (sel_year, sel_month))
-                conn.commit()
-                budget_id = c.lastrowid
-                
             setup_pop()
-        
-            conn.close()
-            # # Opens budget with a uniqe ID
-            # new_bud_pop.destroy()
-            # show_budget_page(budget_id)
-    
 
-            
+        
     ######### BOTTOM SECTION #########
     
     b_frame = tk.Frame(new_bud_pop, background="gray74")
@@ -510,9 +545,7 @@ def new_budget():
     cancel = Button(b_frame, text="Cancel", background="gray90", relief="raised", width=75, 
                   borderless=1, activebackground='red', command=new_bud_pop.destroy)
     cancel.pack(side="right", padx=[5, 30], pady=2.5)
-    
-    
-  
+      
 def load_budget_pop():
     budg_pop = tk.Toplevel()
     budg_pop.title("Load Budget")
@@ -748,7 +781,7 @@ budget_button.config(menu=budget_menu)
 
 ### Saving Menu Button ###
 
-savings_button = tk.Menubutton(menu_frame, text="Saving", font="arial 10 bold", relief="raised", background="gray60")
+savings_button = tk.Menubutton(menu_frame, text="Saving", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 savings_button.pack(side="left", padx=5, pady=2)
 
 savings_menu = tk.Menu(savings_button, tearoff=0)
@@ -761,7 +794,7 @@ savings_button.config(menu=savings_menu)
 
 ### Year Menu Button ###
 
-year_button = tk.Menubutton(menu_frame, text="Year", font="arial 10 bold", relief="raised", background="gray60")
+year_button = tk.Menubutton(menu_frame, text="Year", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 year_button.pack(side="left", padx=5, pady=2)
 
 year_menu = tk.Menu(year_button, tearoff=0)
@@ -773,7 +806,7 @@ year_button.config(menu=year_menu)
 
 ### Reports Button ###
 
-report_button = tk.Menubutton(menu_frame, text="Reports", font="arial 10 bold", relief="raised", background="gray60")
+report_button = tk.Menubutton(menu_frame, text="Reports", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 report_button.pack(side="left", padx=5, pady=2)
 
 report_menu = tk.Menu(report_button, tearoff=0)
@@ -785,7 +818,7 @@ report_button.config(menu=report_menu)
 
 ### Help Button ###
 
-help_button = tk.Menubutton(menu_frame, text="Help", font="arial 10 bold", relief="raised", background="gray60")
+help_button = tk.Menubutton(menu_frame, text="Help", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 help_button.pack(side="left", padx=5, pady=2)
 
 help_menu = tk.Menu(help_button, tearoff=0)

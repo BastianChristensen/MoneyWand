@@ -21,5 +21,9 @@ c.execute("""CREATE TABLE if not exists expenses (
 c.execute("""CREATE TABLE if not exists budgets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     year INT,
-    month TEXT
+    month TEXT,
+    name TEXT,
+    currency TEXT,
+    categories TEXT,
+    spending_limits TEXT
 )""")
