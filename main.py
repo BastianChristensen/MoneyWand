@@ -22,10 +22,8 @@ from datetime import datetime
 ############################################## Setup ##############################################
 
 root = Tk()
-root.geometry("1152x700+100+0")
+root.geometry("1300x700+0+0")
 root.title("Dashboard")
-root.minsize(1152, 700)
-root.maxsize(1152, 700)
 
 # Header - banner at the top of the screen (gray part)
 
@@ -114,17 +112,18 @@ def show_budget_page(id):
     # Fetch settings
     conn = sqlite3.connect("moneywand.db")
     c = conn.cursor()
-    c.execute("SELECT name, currency, categories, spending_limits FROM budgets WHERE id=?", (id,))
+    c.execute("SELECT name, currency, categories, spending_limits, contributors FROM budgets WHERE id=?", (id,))
     row = c.fetchone()
     conn.close()
     
     if row:
-        name, currency, categories_json, limits_json = row
+        name, currency, categories_json, limits_json, contributors_json = row
         categories = json.loads(categories_json)
         spending_limits = json.loads(limits_json)
-        BudgetPage(window, id, name, categories, currency, spending_limits)
+        contributors = json.loads(contributors_json) if contributors_json else []
+        BudgetPage(window, id, name, categories, currency, spending_limits, contributors)
     else:
-        BudgetPage(window, id, "", [], "", {})
+        BudgetPage(window, id, "", [], "", {}, [])
     
 def show_year_page():
     # Cleares the Dashboard
@@ -272,6 +271,9 @@ def new_budget():
             # Add budget to database
             # Budget Setup 
             def setup_pop():
+                
+                contributors = []
+                
                 pop = tk.Toplevel()
                 pop.title("Budget Setup")
                 pop.geometry("360x700+150+50")
@@ -282,7 +284,7 @@ def new_budget():
                 pop.grab_set()
                 pop.transient(root)
                 
-                categories = ["Housing", "Food", "Utilities", "Transport", "Savings", "Insurance", "Debt", "Health", "Entertainment", "Misc"]
+                categories = ["Housing", "Food", "Utilities", "Transport", "Insurance", "Debt", "Health", "Entertainment", "Misc"]
                 cat_var3 = tk.StringVar()
                 
                 ######### TOP SECTION ##########
@@ -302,12 +304,10 @@ def new_budget():
                                         borderwidth=1, relief="sunken")
                 b_inner.pack(padx=10, pady=10, fill="both", expand=True)
                 
-                ######### CONTENT #########
-                
                 
                 ######################################## NAME ########################################
-                
-                
+ 
+ 
                 name_label = tk.Label(t_inner, text="Name", font="system 10 bold", background="gray82", foreground="black")
                 name_label.grid(row=0, column=0, padx=10, pady=10)
                 
@@ -370,7 +370,7 @@ def new_budget():
                 separator2 = ttk.Separator(t_inner, orient=tk.HORIZONTAL)
                 separator2.grid(row=3, column=0, columnspan=3, pady=[10, 10], padx=5, sticky="ew")
                 
-                bseparator2 = ttk.Separator(b_inner, orient=tk.VERTICAL)
+                bseparator2 = ttk.Separator(b_inner, orient=tk.HORIZONTAL)
                 bseparator2.grid(row=3, column=0, columnspan=3, pady=[10, 10], padx=5, sticky="ew")
 
 
@@ -498,7 +498,72 @@ def new_budget():
                 lim_label.grid(row=6, column=0, padx=10, pady=10)
                 
                 lim_edit = Button(t_inner, text="Edit", relief="raised", borderless=1, command=edit_limit_pop)
-                lim_edit.grid(row=6, column=2, padx=10, pady=10)     
+                lim_edit.grid(row=6, column=2, padx=10, pady=10)    
+                
+                separator3 = ttk.Separator(t_inner, orient=tk.HORIZONTAL)
+                separator3.grid(row=7, column=0, columnspan=3, pady=[10, 10], padx=5, sticky="ew")
+                
+            
+                ######################################## CONTRIBUITERS ########################################
+
+
+                contributors_label = tk.Label(t_inner, text="Contributors", font="system 10 bold", background="gray82", foreground="black")
+                contributors_label.grid(row=8, column=0, padx=10, pady=10)
+
+                def edit_contributors_pop():
+                    p = tk.Toplevel(pop)
+                    p.title("Edit Contributors")
+                    p.geometry("300x300")
+                    p.configure(background="gray90")
+                    p.grab_set()
+                    p.transient(pop)
+
+                    tk.Label(p, text="How many contributors?", background="gray90", font="system 11", foreground="black").pack(pady=(15, 5))
+
+                    num_var = tk.IntVar(value=2)
+                    num_menu = tk.OptionMenu(p, num_var, *range(1, 5))
+                    num_menu.configure(relief="sunken", width=5, background="gray90", foreground="black")
+                    num_menu.pack(pady=(0, 10))
+
+                    entry_frame = tk.Frame(p, background="gray90")
+                    entry_frame.pack(pady=5, fill="x", expand=True)
+
+                    person_vars = [tk.StringVar() for _ in range(4)]
+                    entry_rows = []
+
+                    def update_entries(*args):
+                        for row in entry_rows:
+                            row.destroy()
+                        entry_rows.clear()
+                        total = num_var.get()
+                        for i in range(total):
+                            row = tk.Frame(entry_frame, background="gray90")
+                            row.pack(fill="x", pady=3)
+                            if i == 0:
+                                tk.Label(row, text="You", background="gray90", width=10, anchor="w", foreground="black").pack(side="left", padx=5)
+                                entry = tk.Entry(row, width=18, highlightthickness=1, highlightcolor="blue", borderwidth=1, background="white", foreground="black")
+                                entry.pack(side="left", padx=5)
+                                person_vars[i].set("You")
+                            else:
+                                label_text = f"Person {i}:"
+                                tk.Label(row, text=label_text, background="gray90", width=10, anchor="w", foreground="black").pack(side="left", padx=5)
+                                tk.Entry(row, textvariable=person_vars[i], width=18, highlightthickness=1, highlightcolor="blue", borderwidth=1, background="white", foreground="black").pack(side="left", padx=5)
+                            entry_rows.append(row)
+
+                    num_var.trace_add("write", update_entries)
+                    update_entries()
+
+                    def save_contributors():
+                        nonlocal contributors
+                        names = [v.get().strip() for v in person_vars[:num_var.get()]]
+                        contributors = names
+                        p.destroy()
+
+                    Button(p, text="Save", background="PaleGreen1", borderless=1, command=save_contributors).pack(pady=10)
+                    Button(p, text="Cancel", background="gray90", borderless=1, command=p.destroy).pack(pady=10)
+
+                edit_contributors = Button(t_inner, text="Edit", relief="raised", borderless=1, command=edit_contributors_pop)
+                edit_contributors.grid(row=8, column=2, padx=10, pady=10)
 
 
                 def make_budget():
@@ -507,18 +572,20 @@ def new_budget():
                     budget_currency = cat_var.get() or "NOK"
                     budget_categories = categories[:]
                     budget_limits = spending_limits.copy()
+                    budget_contributors = contributors[:]
 
                     # Insert budget into database with all fields
                     c.execute("""
-                        INSERT INTO budgets (year, month, name, currency, categories, spending_limits)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                        INSERT INTO budgets (year, month, name, currency, categories, spending_limits, contributors)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
                     """, (
                         sel_year,
                         sel_month,
                         budget_name,
                         budget_currency,
                         json.dumps(budget_categories),
-                        json.dumps(budget_limits)
+                        json.dumps(budget_limits),
+                        json.dumps(budget_contributors)
                     ))
                     conn.commit()
                     budget_id = c.lastrowid
@@ -527,8 +594,11 @@ def new_budget():
                     new_bud_pop.destroy()
                     show_budget_page(budget_id)
                 
-                crt_btn = Button(t_inner, text="Continue", relief="raised", borderless=1, font="system 15 bold", command=make_budget)
+                crt_btn = Button(b_inner, text="Continue", relief="raised", borderless=1, font="system 15 bold", command=make_budget)
                 crt_btn.grid(row=7, column=0, columnspan=3, padx=10, pady=[20, 10], sticky="ew")
+                b_inner.grid_columnconfigure(0, weight=1)
+                b_inner.grid_columnconfigure(1, weight=1)
+                b_inner.grid_columnconfigure(2, weight=1)
                 
             setup_pop()
 
@@ -779,7 +849,7 @@ budget_menu.add_command(label="Load", command=load_budget_pop)
 
 budget_button.config(menu=budget_menu)
 
-### Saving Menu Button ###
+# Saving Menu Button
 
 savings_button = tk.Menubutton(menu_frame, text="Saving", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 savings_button.pack(side="left", padx=5, pady=2)
@@ -792,7 +862,7 @@ savings_menu.add_command(label="Quick Add", command=quick_add_savings)
 
 savings_button.config(menu=savings_menu)
 
-### Year Menu Button ###
+# Year Menu Button 
 
 year_button = tk.Menubutton(menu_frame, text="Year", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 year_button.pack(side="left", padx=5, pady=2)
@@ -804,7 +874,7 @@ year_menu.add_command(label="New")
 
 year_button.config(menu=year_menu)
 
-### Reports Button ###
+# Reports Button
 
 report_button = tk.Menubutton(menu_frame, text="Reports", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
 report_button.pack(side="left", padx=5, pady=2)
@@ -815,18 +885,6 @@ report_menu.add_command(label="Open", command=show_report_page)
 
 
 report_button.config(menu=report_menu)
-
-### Help Button ###
-
-help_button = tk.Menubutton(menu_frame, text="Help", font="arial 10 bold", relief="raised", background="gray60", foreground="black")
-help_button.pack(side="left", padx=5, pady=2)
-
-help_menu = tk.Menu(help_button, tearoff=0)
-
-help_menu.add_command(label="Guide", command=show_guide_page)
-help_menu.add_command(label="Report A Problem") # Set up link to Formspree page on website.
-
-help_button.config(menu=help_menu)
 
 ###################################################   CONTENT   ##################################################################
 

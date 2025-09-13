@@ -14,6 +14,18 @@ c.execute("""CREATE TABLE if not exists expenses (
     amount REAL,
     comment TEXT,
     budget_id INTEGER,
+    categories TEXT,
+    contributor TEXT,
+    FOREIGN KEY (budget_id) REFERENCES budgets(id)
+)""")
+
+# Table for income
+c.execute("""CREATE TABLE if not exists income (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT,
+    amount REAL,
+    source TEXT,
+    budget_id INTEGER,
     FOREIGN KEY (budget_id) REFERENCES budgets(id)
 )""")
 
@@ -25,5 +37,6 @@ c.execute("""CREATE TABLE if not exists budgets (
     name TEXT,
     currency TEXT,
     categories TEXT,
-    spending_limits TEXT
+    spending_limits TEXT,
+    contributors TEXT
 )""")
