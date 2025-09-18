@@ -12,7 +12,6 @@ from pages.budget import BudgetPage
 from pages.year import YearPage
 from pages.savings import SavingsPage
 from pages.reports import ReportPage
-from pages.help_1 import Guide
 from db.database import *
 
 from tkmacosx import Button
@@ -170,21 +169,6 @@ def show_report_page():
     
     ReportPage(window)
       
-def show_guide_page():
-    # Cleares the Dashboard
-    for widget in window.winfo_children():
-        widget.destroy()
-        
-    # Creates the tab bar (dark gray)
-    tab_bar = tk.Frame(window, background="gray40", height=30)
-    tab_bar.pack(fill="x")
-    
-    # Creates the tab itself
-    tab_label = tk.Label(tab_bar, text="Reports Page", font="Arial 10 bold", background="gray30", foreground="White")
-    tab_label.pack(side="left", padx=10)
-    
-    Guide(window)
-
 ###################################################   POPUP FUNCTIONS  ###################################################################
 
 def new_budget():
@@ -513,54 +497,31 @@ def new_budget():
                 def edit_contributors_pop():
                     p = tk.Toplevel(pop)
                     p.title("Edit Contributors")
-                    p.geometry("300x300")
+                    p.geometry("300x170")
                     p.configure(background="gray90")
                     p.grab_set()
                     p.transient(pop)
 
-                    tk.Label(p, text="How many contributors?", background="gray90", font="system 11", foreground="black").pack(pady=(15, 5))
+                    tk.Label(p, text="You + one person (optional)", background="gray90", font="system 11", foreground="black").pack(pady=(15, 5))
 
-                    num_var = tk.IntVar(value=2)
-                    num_menu = tk.OptionMenu(p, num_var, *range(1, 5))
-                    num_menu.configure(relief="sunken", width=5, background="gray90", foreground="black")
-                    num_menu.pack(pady=(0, 10))
-
-                    entry_frame = tk.Frame(p, background="gray90")
-                    entry_frame.pack(pady=5, fill="x", expand=True)
-
-                    person_vars = [tk.StringVar() for _ in range(4)]
-                    entry_rows = []
-
-                    def update_entries(*args):
-                        for row in entry_rows:
-                            row.destroy()
-                        entry_rows.clear()
-                        total = num_var.get()
-                        for i in range(total):
-                            row = tk.Frame(entry_frame, background="gray90")
-                            row.pack(fill="x", pady=3)
-                            if i == 0:
-                                tk.Label(row, text="You", background="gray90", width=10, anchor="w", foreground="black").pack(side="left", padx=5)
-                                entry = tk.Entry(row, width=18, highlightthickness=1, highlightcolor="blue", borderwidth=1, background="white", foreground="black")
-                                entry.pack(side="left", padx=5)
-                                person_vars[i].set("You")
-                            else:
-                                label_text = f"Person {i}:"
-                                tk.Label(row, text=label_text, background="gray90", width=10, anchor="w", foreground="black").pack(side="left", padx=5)
-                                tk.Entry(row, textvariable=person_vars[i], width=18, highlightthickness=1, highlightcolor="blue", borderwidth=1, background="white", foreground="black").pack(side="left", padx=5)
-                            entry_rows.append(row)
-
-                    num_var.trace_add("write", update_entries)
-                    update_entries()
+                    row = tk.Frame(p, background="gray90")
+                    row.pack(fill="x", pady=3)
+                    tk.Label(row, text="You", background="gray90", width=10, anchor="w", foreground="black").pack(side="left", padx=5)
+                    tk.Label(row, text="+", background="gray90", width=2, anchor="center", foreground="black").pack(side="left")
+                    other_var = tk.StringVar()
+                    tk.Entry(row, textvariable=other_var, width=18, highlightthickness=1, highlightcolor="blue", borderwidth=1, background="white", foreground="black").pack(side="left", padx=5)
 
                     def save_contributors():
                         nonlocal contributors
-                        names = [v.get().strip() for v in person_vars[:num_var.get()]]
-                        contributors = names
+                        name = (other_var.get() or "").strip()
+                        if name and name != "You":
+                            contributors = ["You", name]
+                        else:
+                            contributors = ["You"]
                         p.destroy()
 
                     Button(p, text="Save", background="PaleGreen1", borderless=1, command=save_contributors).pack(pady=10)
-                    Button(p, text="Cancel", background="gray90", borderless=1, command=p.destroy).pack(pady=10)
+                    Button(p, text="Cancel", background="gray90", borderless=1, command=p.destroy).pack(pady=0)
 
                 edit_contributors = Button(t_inner, text="Edit", relief="raised", borderless=1, command=edit_contributors_pop)
                 edit_contributors.grid(row=8, column=2, padx=10, pady=10)

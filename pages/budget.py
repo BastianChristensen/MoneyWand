@@ -4,14 +4,11 @@ import tkinter.messagebox
 import sqlite3
 import json
 
-# Report Imports
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-
 from tkinter import *
 from tkinter import Button
 from tkinter import ttk
 from tkinter import Toplevel, Button
+
 
 # Need this one to fix button background bug 
 from tkmacosx import Button
@@ -27,14 +24,21 @@ class BudgetPage:
         self.budget_categories = categories
         self.currency = currency
         self.spending_limit = spending_limits
-        self.contributors = contributors
+
+        norm = contributors or []
+        if "You" not in norm:
+            norm = ["You"] + norm
+        else:
+            norm = ["You"] + [c for c in norm if c != "You"]
+
+        self.contributors = norm[:2]
         self.frame = tk.Frame(window, background="white")
         self.frame.pack(side="top", fill="both", expand=True)
 
 ####################################################################################################################################################################################        
 ############   MISC   ####################################################################################################################################################################################
 ####################################################################################################################################################################################
-   
+
         def query_income_tree():
             conn = sqlite3.connect("moneywand.db")
             c = conn.cursor()
@@ -45,6 +49,13 @@ class BudgetPage:
                 tag = "evenrow" if count % 2 == 0 else "oddrow"
                 income_tree.insert('', 'end', values=row, tags=(tag,))
             conn.close()
+            
+        def on_budget_select(self, event):
+            selected = event.widget.selection()
+            if not selected:
+                return
+            year, month = event.widget.item(selected[0])["values"]
+            self.display_report(year, month)
 
 ####################################################################################################################################################################################        
 ############   BOTTOM SECTION   ####################################################################################################################################################################################
@@ -134,10 +145,18 @@ class BudgetPage:
         def get_spent_for_category(cat):
             conn = sqlite3.connect("moneywand.db")
             c = conn.cursor()
-            c.execute("SELECT SUM(amount) FROM expenses WHERE budget_id=? AND category=?", (self.id, cat))
+            c.execute(
+                """
+                SELECT SUM(amount)
+                FROM expenses
+                WHERE budget_id=? AND category=?
+                  AND COALESCE(contributor, '') <> 'You'
+                """,
+                (self.id, cat)
+            )
             result = c.fetchone()
             conn.close()
-            return result[0] if result[0] is not None else 0
+            return result[0] if (result and result[0] is not None) else 0
 
         style = ttk.Style()
         style.theme_use("default")
@@ -166,9 +185,10 @@ class BudgetPage:
         # Updates the progressbar
         def update_progress_bars():
             def fmt(val):
-                if val == int(val):
-                    return str(int(val))
-                return str(val)
+                try:
+                    return f"{float(val):.2f}"
+                except Exception:
+                    return str(val)
             
             for cat in self.budget_categories:
                 spent = get_spent_for_category(cat)
@@ -789,9 +809,13 @@ class BudgetPage:
                         background="gray90", width=75, command=assign_entry)
         assign_btn.grid(row=0, column=1, padx=[5, 5], pady=1, sticky="w") 
         
-        tbd_btn = Button(form_wrapper, text="TBD", relief="raised", borderless=1,
-                            background="gray90", width=75)
-        tbd_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
+        now = datetime.now()
+        current_year = now.year
+        current_month = now.month
+        
+        export_btn = Button(form_wrapper, text="Export PDF", bg="royalblue", fg="white",
+                                 borderless=1, command=self.export_to_pdf, width=75)
+        export_btn.grid(row=0, column=2, padx=[5, 1], pady=1, sticky="w")
 
 
         ########### RUN ##########
@@ -824,9 +848,10 @@ class BudgetPage:
             conn.close()
 
             def fmt(val):
-                if val == int(val):
-                    return str(int(val))
-                return str(val)
+                try:
+                    return f"{float(val):.2f}"
+                except Exception:
+                    return str(val)
             
             for cat in self.budget_categories:
                 pb, lim_label = self.progress_widgets[cat]
@@ -839,3 +864,217 @@ class BudgetPage:
                         
         query_database()
         query_income_tree()
+
+# PDF Exporter for BudgetPage
+def _budget_export_to_pdf(self):
+    # Ensure ReportLab is available
+    try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    except Exception:
+        tkinter.messagebox.showerror(
+            "ReportLab not available",
+            "ReportLab is required to export PDFs.\nInstall with:\n\npip install reportlab",
+        )
+        return
+
+    # Gather basic metadata
+    conn = sqlite3.connect("moneywand.db")
+    c = conn.cursor()
+    month = year = None
+    try:
+        c.execute("SELECT month, year FROM budgets WHERE id=?", (self.id,))
+        row = c.fetchone()
+        if row:
+            month, year = row[0], row[1]
+    except Exception:
+        pass
+
+    title = f"{month} {year}" if month and year else (self.name or "Budget Report")
+
+    # Categories, limits, contributors
+    categories = list(self.budget_categories)
+    limits = dict(self.spending_limit or {})
+    contributors = list(self.contributors or [])
+
+    # Spent per category
+    spent_per_cat = {}
+    total_spent = 0.0
+    for cat in categories:
+        c.execute("SELECT SUM(amount) FROM expenses WHERE budget_id=? AND category=?", (self.id, cat))
+        val = c.fetchone()[0] or 0
+        spent_per_cat[cat] = float(val)
+        total_spent += float(val)
+
+    # Income entries
+    c.execute("SELECT source, amount FROM income WHERE budget_id=?", (self.id,))
+    income_entries = c.fetchall()
+    total_income = sum(float(a or 0) for _, a in income_entries)
+
+    # Assigned expenses per contributor
+    c.execute(
+        """
+            SELECT date, category, amount, comment, contributor
+            FROM expenses
+            WHERE budget_id=? AND contributor IS NOT NULL AND TRIM(contributor) <> ''
+            ORDER BY date ASC
+        """,
+        (self.id,)
+    )
+    assigned = c.fetchall()
+
+    contrib_map = {name: [] for name in contributors}
+    for d, cat, amt, com, contr in assigned:
+        if contr in contrib_map:
+            contrib_map[contr].append((d or '', cat or '', com or '', float(amt or 0)))
+
+    contrib_totals = {name: sum(amt for _, _, _, amt in contrib_map.get(name, [])) for name in contributors}
+
+    # Full expense rows
+    c.execute(
+        """
+            SELECT date, category, comment, contributor, amount
+            FROM expenses
+            WHERE budget_id=?
+            ORDER BY date ASC
+        """,
+        (self.id,)
+    )
+    expense_rows = c.fetchall()
+    conn.close()
+
+    balance = total_income - total_spent
+
+    # Ask path
+    safe_title = str(title).replace("/", "-").replace("\\", "-")
+    initial = f"{safe_title}.pdf"
+    try:
+        from tkinter import filedialog
+        file_path = filedialog.asksaveasfilename(
+            title="Save Report as PDF",
+            defaultextension=".pdf",
+            initialfile=initial,
+            filetypes=[("PDF files", "*.pdf")]
+        )
+    except Exception:
+        file_path = None
+    if not file_path:
+        return
+
+    # Build PDF
+    styles = getSampleStyleSheet()
+    doc = SimpleDocTemplate(file_path, pagesize=A4, title=title)
+    story = []
+
+    story.append(Paragraph(title, styles["Title"]))
+    story.append(Spacer(1, 12))
+
+    story.append(Paragraph("Income and Expenses", styles["Heading2"]))
+    story.append(Spacer(1, 6))
+
+    cat_data = [["Category", "Spent"]]
+    for cat in categories:
+        cat_data.append([cat, f"{float(spent_per_cat.get(cat, 0)):.2f}"])
+    if len(cat_data) > 1:
+        t = Table(cat_data, hAlign='LEFT', colWidths=[200, 80])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 0.25, colors.grey),
+            ('ALIGN', (1,1), (-1,-1), 'RIGHT'),
+        ]))
+        story.append(t)
+        story.append(Spacer(1, 6))
+
+    story.append(Paragraph(f"Total Spent: <b>{float(total_spent):.2f}</b>", styles["Normal"]))
+    story.append(Spacer(1, 6))
+
+    income_data = [["Source", "Amount"]]
+    for source, amount in income_entries:
+        income_data.append([str(source), f"{float(amount or 0):.2f}"])
+    if len(income_data) > 1:
+        t = Table(income_data, hAlign='LEFT', colWidths=[200, 80])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 0.25, colors.grey),
+            ('ALIGN', (1,1), (-1,-1), 'RIGHT'),
+        ]))
+        story.append(t)
+        story.append(Spacer(1, 6))
+
+    story.append(Paragraph(f"Total Income: <b>{float(total_income):.2f}</b>", styles["Normal"]))
+    bal_color = 'green' if balance >= 0 else 'red'
+    story.append(Paragraph(f"Balance: <font color='{bal_color}'><b>{float(balance):.2f}</b></font>", styles["Normal"]))
+    story.append(Spacer(1, 12))
+
+    story.append(Paragraph("Budget Details", styles["Heading2"]))
+    details_data = [["Category", "Spending Limit", "Amount Spent", "Over / Under"]]
+    for cat in categories:
+        limit_val = float(limits.get(cat, 0) or 0)
+        spent_val = float(spent_per_cat.get(cat, 0) or 0)
+        diff = spent_val - limit_val
+        details_data.append([
+            cat,
+            f"{limit_val:.2f}",
+            f"{spent_val:.2f}",
+            f"{diff:.2f}",
+        ])
+    if len(details_data) > 1:
+        t = Table(details_data, hAlign='LEFT', colWidths=[160, 80, 80, 80])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 0.25, colors.grey),
+            ('ALIGN', (1,1), (-1,-1), 'RIGHT'),
+        ]))
+        story.append(t)
+        story.append(Spacer(1, 12))
+
+    if contributors:
+        story.append(Paragraph("Contributors", styles["Heading2"]))
+        for name in contributors:
+            story.append(Paragraph(name, styles["Heading3"]))
+            cdata = [["Entry", "Amount"]]
+            for d, cat, com, amt in contrib_map.get(name, []):
+                left = cat if not com else f"{cat} - {com}"
+                if d:
+                    left = f"{d} | {left}"
+                cdata.append([left, f"{float(amt or 0):.2f}"])
+            total_val = float(contrib_totals.get(name, 0))
+            cdata.append(["Total", f"{total_val:.2f}"])
+            t = Table(cdata, hAlign='LEFT', colWidths=[300, 80])
+            t.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+                ('GRID', (0,0), (-1,-1), 0.25, colors.grey),
+                ('ALIGN', (1,1), (-1,-1), 'RIGHT'),
+            ]))
+            story.append(t)
+            story.append(Spacer(1, 6))
+        story.append(Spacer(1, 6))
+
+    if expense_rows:
+        story.append(Paragraph("Expense Details", styles["Heading2"]))
+        exp_data = [["Date", "Category", "Comment", "Contributor", "Amount"]]
+        for d, cat, com, contr, amt in expense_rows:
+            exp_data.append([
+                str(d or ''), str(cat or ''), str(com or ''), str(contr or ''), f"{float(amt or 0):.2f}"
+            ])
+        t = Table(exp_data, hAlign='LEFT', colWidths=[70, 100, 190, 90, 70])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 0.25, colors.grey),
+            ('ALIGN', (4,1), (4,-1), 'RIGHT'),
+        ]))
+        story.append(t)
+
+    try:
+        doc.build(story)
+    except Exception as e:
+        tkinter.messagebox.showerror("Export PDF", f"Failed to export PDF:\n{e}")
+        return
+
+    tkinter.messagebox.showinfo("Export PDF", "Report exported successfully.")
+
+
+# Bind the exporter to the class so existing button works
+BudgetPage.export_to_pdf = _budget_export_to_pdf
